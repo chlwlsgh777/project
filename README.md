@@ -5,7 +5,7 @@
 git init >> .git 초기화  
 git config --global user.name "이름"  
 git config --global user.email "이메일"  
-git clone htttps://github.com/chlwlsgh777/project.git  
+git clone https://github.com/chlwlsgh777/project.git  
 
 # 깃 사용법
 cd 디렉토리명   * 디렉토리 위치 변경  
