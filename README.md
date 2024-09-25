@@ -2,8 +2,9 @@
 겜색기
 
 # 깃 초기설정. (다른 곳에서 할때)
-$ git config --global user.name "이름"  
-$ git config --global user.email "이메일"  
+git init >> .git 초기화  
+git config --global user.name "이름"  
+git config --global user.email "이메일"  
 git clone htttps://github.com/chlwlsgh777/project.git  
 
 # 깃 사용법
