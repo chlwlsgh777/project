@@ -7,7 +7,7 @@ $ git config --global user.email "이메일"
 git clone htttps://github.com/chlwlsgh777/project.git
 
 # 깃 사용법
-cd 디렉토리명   * 디렉토리 위치 변경\t
+cd 디렉토리명   * 디렉토리 위치 변경  
 git remote update >> 갱신
 git checkout -b (브랜치명)  >> 브랜치 생성 & 이동 ( -b 빼면 해당 브랜치로 이동 )
 git merge <다른 브랜치이름> >> 브랜치 합치기 ( 현재 위치한 브랜치 기준으로 )
