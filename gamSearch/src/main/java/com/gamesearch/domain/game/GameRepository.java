@@ -6,3 +6,5 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     boolean existsByAppId(Long appId);
     
 }
+
+

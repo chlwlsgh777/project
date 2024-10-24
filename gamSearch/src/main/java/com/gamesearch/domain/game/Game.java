@@ -29,32 +29,31 @@ public class Game {
 
     // 게임 ID 번호
     @JsonProperty("app_id")
-    @Column(nullable = false, name = "app_id", unique = true)
+    @Column(nullable = false, unique = true)
     private Long appId;
 
     @JsonProperty("name")
-    @Column(nullable = false, name = "name")
+    @Column(nullable = false)
     private String name;
 
 
     // 출시일
     @JsonProperty("release_date")
-    @Column(nullable = false, name = "release_date")
+    @Column(nullable = false)
     private LocalDate releaseDate;
 
     // 가격
     @JsonProperty("price")
-    @Column(nullable = false, name = "price")
+    @Column(nullable = false)
     private double price;
 
     // 추천수
     @JsonProperty("recommendations")
-    @Column(name = "recommendations")
     private int recommendations;
 
     // 지원 언어
     @JsonProperty("supported_languages")
-    @ElementCollection
+    @Column(length = 500)
     private List<String> supportedLanguages;
 
     // 카테고리
@@ -64,34 +63,32 @@ public class Game {
 
     // 장르
     @JsonProperty("genres")
+    @Column(name = "genre")
     @ElementCollection
-    private List<String> genres;
+    private List<String> genre;
 
     // 긍정적 리뷰 개수
     @JsonProperty("positive")
-    @Column(name = "positive")
     private int positive;
 
     // 부정적 리뷰 개수
     @JsonProperty("negative")
-    @Column(name = "negative")
     private int negative;
 
     // 긍정적 비율
     @JsonProperty("positive_rate")
-    @Column(name = "positive_rate")
     private int positiveRate;
 
     // 평가
     @JsonProperty("evaluation")
-    @Column(name = "evaluation")
     private String evaluation;
 
 
     // 태그
     @JsonProperty("tags")
+    @Column(name = "tag")
     @ElementCollection
-    private List<String> tags;
+    private List<String> tag;
 
 
     
@@ -100,14 +97,7 @@ public class Game {
 
     }
 
-
-
-
-
-
-
-    
-
-
     
 }
+
+
