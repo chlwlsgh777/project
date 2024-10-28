@@ -1,36 +1,38 @@
+index.html
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>챗봇 대화창</title>
+    <title>겜색기</title>
     <style>
         body {
             font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-            background-color: #b2c7d9;
+            background-color: #2b2b2b;
+            color: #ffffff;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column; /* 세로 방향으로 정렬 */
-            align-items: center; /* 수평 중앙 정렬 */
-            height: 100vh; /* 화면 전체 높이 사용 */
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
         }
 
         #header {
-            text-align: center; /* 중앙 정렬 */
-            margin-bottom: 20px; /* 아래 여백 추가 */
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         #chat-wrapper {
-            width: 100%; /* 전체 너비 사용 */
-            max-width: 800px; /* 최대 너비 설정 */
-            margin: 20px; /* 여백 추가 */
+            width: 100%;
+            max-width: 800px;
+            margin: 20px;
         }
 
         #chat-container {
-            background-color: #fff;
+            background-color: #3c3c3c;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         #chat-messages {
@@ -38,25 +40,26 @@
             overflow-y: auto;
             padding: 20px;
             display: flex;
-            flex-direction: column; /* 세로 방향으로 정렬 */
+            flex-direction: column;
         }
 
         .message {
             margin-bottom: 10px;
             max-width: 70%;
-            clear: both; /* 이전 메시지와 겹치지 않도록 설정 */
+            clear: both;
         }
 
         .user-message {
-            background-color: #ffeb33;
-            align-self: flex-end; /* 오른쪽 정렬 */
+            background-color: #4caf50;
+            align-self: flex-end;
             border-radius: 15px 0 15px 15px;
             padding: 10px;
         }
 
         .bot-message {
-            background-color: #ffffff;
-            align-self: flex-start; /* 왼쪽 정렬 */
+            background-color: #4caf50;
+            color: #000;
+            align-self: flex-start;
             border-radius: 0 15px 15px 15px;
             padding: 10px;
         }
@@ -64,7 +67,7 @@
         #user-input {
             display: flex;
             padding: 10px;
-            background-color: #eee;
+            background-color: #444;
         }
 
         #user-input input {
@@ -75,7 +78,7 @@
         }
 
         #user-input button {
-            background-color: #ffeb33;
+            background-color: #4caf50;
             border: none;
             padding: 10px 20px;
             margin-left: 10px;
@@ -83,50 +86,90 @@
             cursor: pointer;
         }
 
-        .game-info {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
+        .game-box {
+            background-color: #4a4a4a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
 
-        .game-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .game-box h3 {
+            color: #4caf50;
+            margin-top: 0;
         }
 
-        .game-details {
-            font-size: 14px;
-            margin: 3px 0;
+        .game-box p {
+            margin-bottom: 0;
         }
 
-        .game-tags {
-            font-style: italic;
+        .game-box {
+            background-color: #4a4a4a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .game-box h3 {
+            color: #4caf50;
+            margin-top: 0;
+        }
+
+        .game-box p {
+            margin-bottom: 0;
         }
     </style>
 </head>
 
 <body>
-    <div id="header">
-        <h1>게임 검색</h1>
-        <p>Explore games, find reviews, and more!</p>
-        
-        <!-- 로그인 및 회원가입 링크 -->
-        <a href="/login">Login</a> | 
-        <a href="/register">Sign Up</a>
+    <nav th:replace="~{nav.html::global-nav}"></nav>
+
+    <div id="header" sec:authorize="isAuthenticated()">
+        <span th:text="${#authentication.name}">사용자</span>님 환영합니다 |
+        <a href="/mypage" style="color:#ffcc00;">마이페이지</a> |
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" style="background:none; border:none; color:#ffcc00; cursor:pointer;">로그아웃</button>
+        </form>
     </div>
+
+    <div sec:authorize="isAnonymous()">
+        <a href="/login">로그인</a>
+        <a href="/register">회원가입</a>
+    </div>
+
     <div id="chat-wrapper">
         <div id="chat-container">
             <div id="chat-messages"></div>
             <div id="user-input">
-                <input type="text" id="message-input" placeholder="메시지를 입력하세요...">
+                <input type="text" id="message-input" placeholder="메시지를 입력하세요..."
+                    style="background-color:#666; color:white;">
                 <button onclick="sendMessage()">전송</button>
             </div>
         </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/chat',
+                method: 'POST',
+                data: { userInput: 'start' },
+                success: function (data) {
+                    console.log("Received data:", data);  // 디버깅을 위한 로그
+                    if (data && data.response) {
+                        addMessage('bot', data.response);
+                    } else {
+                        addMessage('bot', '응답을 받지 못했습니다.');
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    addMessage('bot', '오류가 발생했습니다.');
+                }
+            });
+        });
+
         function sendMessage() {
             const input = document.getElementById('message-input');
             const message = input.value.trim();
@@ -138,13 +181,11 @@
                     method: 'POST',
                     data: { userInput: message },
                     success: function (data) {
-                        const response = JSON.parse(data).response;
-
-                        // 응답이 비어있을 때 기본 메시지 처리
-                        if (!response || response.trim() === "") {
-                            addMessage('bot', "해당 키워드에 맞는 게임을 찾을 수 없습니다.");
+                        console.log("Received data:", data);  // 디버깅을 위한 로그
+                        if (data && data.response) {
+                            addMessage('bot', data.response);
                         } else {
-                            addMessage('bot', response);
+                            addMessage('bot', '응답을 받지 못했습니다.');
                         }
                     },
                     error: function (error) {
@@ -153,45 +194,98 @@
                     }
                 });
                 input.value = '';
-                input.focus(); // 입력란에 포커스 유지
+                input.focus();
             }
         }
 
-        function addMessage(sender, text) {
-            const messagesContainer = document.getElementById('chat-messages');
+        function createGameBox(game) {
+            const gameBox = document.createElement('div');
+            gameBox.className = 'game-box';
 
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', sender + '-message');
+            const title = document.createElement('h3');
+            title.textContent = game.name;
+            gameBox.appendChild(title);
 
-            if (sender === 'bot' && text.includes('\n\n')) {
-                const games = text.split('\n\n'); // 두 줄바꿈으로 게임 정보 구분
+            const details = document.createElement('p');
+            details.innerHTML = `
+            앱 ID: ${game.appId}<br>
+            출시일: ${game.releaseDate}<br>
+            장르: ${game.genres}<br>
+            태그: ${game.tags}
+        `;
+            gameBox.appendChild(details);
 
-                games.forEach(game => {
-                    const gameInfo = game.split('\n');
+            return gameBox;
+        }
 
-                    // 유효한 게임 정보인지 확인 (5개 항목이 모두 있는지)
-                    if (gameInfo.length >= 5) {
-                        const gameInfoElement = document.createElement('div');
-                        gameInfoElement.classList.add('game-info');
-
-                        gameInfoElement.innerHTML = `
-                            <div class="game-title">${gameInfo[0].split(': ')[1]}</div>
-                            <div class="game-details">${gameInfo[1]}</div>
-                            <div class="game-details">${gameInfo[2]}</div>
-                            <div class="game-details">${gameInfo[3]}</div>
-                            <div class="game-tags">${gameInfo[4]}</div>
-                        `;
-                        messageElement.appendChild(gameInfoElement);
-                    }
-                });
-            } else {
-                // 기본 메시지 또는 오류 메시지 처리
-                messageElement.textContent = text;
+        function createGameBox(gameInfo) {
+            // 게임 정보가 비어있거나 유효하지 않은 경우 반환하지 않음
+            if (!gameInfo || gameInfo.trim() === '') {
+                console.warn("Empty game info received, skipping box creation."); // 디버깅 로그
+                return null; // 빈 박스를 생성하지 않음
             }
 
-            messagesContainer.appendChild(messageElement);
+            const gameBox = document.createElement('div');
+            gameBox.className = 'game-box';
 
-            // 스크롤을 맨 아래로 이동
+            const lines = gameInfo.split('<br>');
+            const gameName = lines[0].split(': ')[1];
+
+            if (!gameName) {
+                console.warn("Game name is missing, skipping box creation."); // 디버깅 로그
+                return null; // 게임 이름이 없으면 박스 생성 안 함
+            }
+
+            const title = document.createElement('h3');
+            title.textContent = gameName;
+            gameBox.appendChild(title);
+
+            const details = document.createElement('p');
+            details.innerHTML = lines.slice(1).join('<br>');
+            gameBox.appendChild(details);
+
+            return gameBox;
+        }
+
+        function addMessage(sender, text) {
+            console.log("Adding message:", sender, text);
+            const messagesContainer = document.getElementById('chat-messages');
+
+            if (sender === 'bot') {
+                if (text.includes("게임 이름:")) {
+                    const parts = text.split('다른 목록을 보여드릴까요? (예 / 아니요)');
+                    const gamesInfo = parts[0].trim().replace(/\s+/g, ' ');
+                    const lastMessage = parts[1] ? parts[1].trim() : '다른 목록을 보여드릴까요? (예 / 아니요)';
+
+                    const games = gamesInfo.split('<br><br>').filter(game => game.trim() !== '');
+                    games.forEach(gameInfo => {
+                        const gameBox = createGameBox(gameInfo);
+                        if (gameBox) { // 유효한 게임 박스만 추가
+                            messagesContainer.appendChild(gameBox);
+                        } else {
+                            console.warn("A game box was not created for the following info:", gameInfo); // 디버깅 로그
+                        }
+                    });
+
+                    if (lastMessage) {
+                        const messageElement = document.createElement('div');
+                        messageElement.className = 'message bot-message';
+                        messageElement.textContent = lastMessage;
+                        messagesContainer.appendChild(messageElement);
+                    }
+                } else {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message bot-message';
+                    messageElement.innerHTML = text.replace(/<br>/g, '<br>');
+                    messagesContainer.appendChild(messageElement);
+                }
+            } else {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message user-message';
+                messageElement.textContent = text;
+                messagesContainer.appendChild(messageElement);
+            }
+
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     </script>

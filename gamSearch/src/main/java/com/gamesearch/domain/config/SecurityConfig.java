@@ -7,12 +7,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig implements WebMvcConfigurer {
+public class SecurityConfig implements WebMvcConfigurer{
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -24,21 +25,36 @@ public class SecurityConfig implements WebMvcConfigurer {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/chat", "/index", "/home", "/register", "/login", "/check-email").permitAll()
+                .requestMatchers("/", "/chat", "/index", "/register", "/login", "/check-email").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/home", true)
+                .defaultSuccessUrl("/", true)
+                .failureUrl("/login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
                 .permitAll()
+            )
+            .sessionManagement(session -> session
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true)
+                .expiredUrl("/login?expired")
             );
+          
 
         return http.build();
     }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
