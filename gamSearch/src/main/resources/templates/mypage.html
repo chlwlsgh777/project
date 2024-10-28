@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Page</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            background-color: #2b2b2b; /* 어두운 배경 */
+            color: #ffffff; /* 흰색 텍스트 */
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 중앙 정렬 */
+            height: 100vh; /* 전체 화면 높이 */
+            justify-content: center; /* 수직 중앙 정렬 */
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em; /* 제목 크기 조정 */
+        }
+
+        main {
+            text-align: center; /* 중앙 정렬 */
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #ffcc00; /* 버튼 색상 */
+            color: #000; /* 버튼 텍스트 색상 */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s; /* 부드러운 전환 효과 */
+        }
+
+        button:hover {
+            background-color: #e6b800; /* 호버 시 색상 변경 */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to GameSearch!</h1>
+    </header>
+
+    <main>
+        <p>안녕하세요, <span th:text="${#authentication.name}"></span>님! <span th:text="${#authentication.name}"></span>님의 마이 페이지 입니다.</p>
+        
+        <!-- 로그아웃 버튼 -->
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Logout</button>
+        </form>
+    </main>
+</body>
+</html>

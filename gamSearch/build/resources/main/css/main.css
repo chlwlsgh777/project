@@ -1,0 +1,19 @@
+.global-nav {
+    border: 1px solid gray;
+    height: 2.4em; 
+    margin-bottom: 30px; 
+}
+
+.global-nav a {
+    text-decoration: none;
+    color :darkslateblue;
+    margin-right: 8px;
+
+}
+
+.global-nav .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-left: 5px;
+
+}

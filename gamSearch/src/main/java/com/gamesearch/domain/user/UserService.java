@@ -1,5 +1,6 @@
 package com.gamesearch.domain.user;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,14 @@ public class UserService {
         throw new RuntimeException("비밀번호가 일치하지 않습니다.");
     }
 
-    return user;
-}
+        return user;
+    }
+    
+    public boolean isEmailAvailable(String email) {
+        return !userRepository.existsByEmail(email);
+    }
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
 }

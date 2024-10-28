@@ -1,25 +1,144 @@
 <!DOCTYPE html>
-<html lang = ko xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>회원가입</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            background-color: #2b2b2b; /* 어두운 배경 */
+            color: #ffffff; /* 흰색 텍스트 */
+            display: flex;
+            justify-content: center; /* 수평 중앙 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+            height: 100vh; /* 전체 화면 높이 */
+            margin: 0;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .registration-container {
+            background-color: #3c3c3c; /* 어두운 회색 배경 */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 300px; /* 고정 너비 */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%; /* 전체 너비 사용 */
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: none;
+            background-color: #555; /* 입력창 배경색 */
+            color: #fff; /* 입력 텍스트 색상 */
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none; /* 포커스 시 테두리 제거 */
+            background-color: #666; /* 포커스 시 배경색 변경 */
+        }
+
+        button {
+            width: 100%; /* 전체 너비 사용 */
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #ffcc00; /* 버튼 색상 */
+            color: #000; /* 버튼 텍스트 색상 */
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e6b800; /* 호버 시 색상 변경 */
+        }
+    </style>
 </head>
 <body>
-    <h2>회원가입</h2>
-    <!-- 회원가입 폼 -->
-    <form th:action="@{/register}" th:object="${user}" method="post">
-        <div>
-            <label for="name">이름:</label>
-            <input type="text" id="name" th:field="*{name}" required>
-        </div>
-        <div>
-            <label for="email">이메일:</label>
-            <input type="email" id="email" th:field="*{email}" required>
-        </div>
-        <div>
-            <label for="password">비밀번호:</label>
-            <input type="password" id="password" th:field="*{password}" required>
-        </div>
-        <button type="submit">가입하기</button>
-    </form>
+    <div class="registration-container">
+        <h2>회원가입</h2>
+
+        <!-- 회원가입 폼 -->
+        <form th:action="@{/register}" th:object="${user}" method="post">
+            <div>
+                <label for="name">이름:</label>
+                <input type="text" id="name" th:field="*{name}" required placeholder="이름을 입력하세요">
+            </div>
+            <div>
+                <label for="email">이메일:</label>
+                <input type="email" id="email" th:field="*{email}" required placeholder="이메일을 입력하세요">
+            </div>
+            <button id="btnCheck" type="button">중복확인</button><span id="checkResult" style="color:red;"></span>
+            <div>
+                <label for="password">비밀번호:</label>
+                <input type="password" id="password" th:field="*{password}" required placeholder="비밀번호를 입력하세요">
+            </div>
+            <button type="submit">가입하기</button>
+        </form>
+    </div>
+
+    <script>
+    (()=>{
+    const $email = document.querySelector('#email');
+    const $checkResult = document.querySelector('#checkResult');
+    let isEmailVerified = false;
+
+    const verifyEmail = function () {
+        const email = $email.value;
+        return email.length !== 0;
+    }
+
+    // 이메일 중복확인 버튼 핸들러
+    const $btnCheck = document.querySelector('#btnCheck');
+    $btnCheck.addEventListener('click', () => {
+        if(verifyEmail()){
+            const checkEmail = {
+                email: $email.value
+            }
+            fetch('/check-email', {
+                method: 'POST',
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(checkEmail)
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.available){
+                    alert("사용 가능한 이메일입니다.");
+                    const confirmBox = confirm("해당 이메일을 사용하시겠습니까?");
+                    if(confirmBox){
+                        $checkResult.textContent = ' 중복확인완료';
+                        $checkResult.style.color = 'green';
+                    } else {
+                        $email.value = "";
+                        $checkResult.textContent = "";
+                    }
+                } else {
+                    throw new Error("이미 사용 중인 이메일입니다.");
+                }
+            })
+            .catch((error) => {
+                alert(error.message);
+                $email.value = "";
+                $checkResult.textContent = "";
+            });
+        } else {
+            alert("이메일을 입력하세요");
+        }
+    });
+})();
+    </script>
 </body>
 </html>
