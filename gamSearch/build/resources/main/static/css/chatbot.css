@@ -77,3 +77,19 @@
 .game-tags {
     font-style: italic;
 }
+
+.game-box {
+    background-color: #007bff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.game-box h3 {
+    color: #4caf50;
+    margin-top: 0;
+}
+
+.game-box p {
+    margin-bottom: 0;
+}
