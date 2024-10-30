@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쳇봇</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/chatbot.css}">
+</head>
+<body>
+    <div th:replace="~{nav :: global-nav}"></div>
+    
+    <main class="main-content">
+        <h1>채팅봇</h1>
+        <div id="chat-wrapper">
+            <div id="chat-container">
+                <div id="chat-messages"></div>
+                <div id="user-input">
+                    <input type="text" id="message-input" placeholder="메시지를 입력하세요..." style="background-color:#666; color:white;">
+                    <button onclick="sendMessage()">전송</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+    
+            if (message) {
+                addMessage('user', message);
+                $.ajax({
+                    url: '/chat',
+                    method: 'POST',
+                    data: { userInput: message },
+                    success: function (data) {
+                        const response = JSON.parse(data).response;
+    
+                        if (!response || response.trim() === "") {
+                            addMessage('bot', "해당 키워드에 맞는 게임을 찾을 수 없습니다.");
+                        } else {
+                            addMessage('bot', response);
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                        addMessage('bot', '오류가 발생했습니다.');
+                    }
+                });
+                input.value = '';
+                input.focus();
+            }
+        }
+    
+        function addMessage(sender, text) {
+            const messagesContainer = document.getElementById('chat-messages');
+    
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender + '-message');
+    
+            if (sender === 'bot' && text.includes('\n\n')) {
+                const games = text.split('\n\n');
+    
+                games.forEach(game => {
+                    const gameInfo = game.split('\n');
+    
+                    if (gameInfo.length >= 5) {
+                        const gameInfoElement = document.createElement('div');
+                        gameInfoElement.classList.add('game-info');
+    
+                        gameInfoElement.innerHTML = `
+                            <div class="game-title">${gameInfo[0].split(': ')[1]}</div>
+                            <div class="game-details">${gameInfo[1]}</div>
+                            <div class="game-details">${gameInfo[2]}</div>
+                            <div class="game-details">${gameInfo[3]}</div>
+                            <div class="game-tags">${gameInfo[4]}</div>
+                        `;
+                        messageElement.appendChild(gameInfoElement);
+                    }
+                });
+            } else {
+                messageElement.textContent = text;
+            }
+    
+            messagesContainer.appendChild(messageElement);
+            
+            // 스크롤을 맨 아래로 이동
+            messagesContainer.scrollTop = messagesContainer.scrollHeight; 
+        }
+    </script>
+</body>
+</html>
