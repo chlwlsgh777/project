@@ -62,25 +62,25 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestParam String email, @RequestParam String password, 
-                            Model model, HttpSession session) {
-        try {
-            User user = userService.loginUser(email, password);
-            session.setAttribute("loggedInUser", user);
-            return "redirect:/index";
-        } catch (RuntimeException e) {
-            model.addAttribute("error", "이메일 또는 비밀번호가 올바르지 않습니다.");
-            return "redirect:/login?error";
-        }
+public String loginUser(@RequestParam String email, @RequestParam String password, 
+                        Model model) {
+    try {
+        // Spring Security의 AuthenticationManager를 통해 인증을 처리하도록 변경
+        userService.loginUser(email, password);
+        return "redirect:/index"; // 로그인 성공 시 인덱스로 리다이렉트
+    } catch (RuntimeException e) {
+        model.addAttribute("error", "이메일 또는 비밀번호가 올바르지 않습니다.");
+        return "login"; // 실패 시 로그인 페이지로 돌아감
     }
-        @GetMapping("/mypage")
+}
+    @GetMapping("/mypage")
     public String showMyPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-        User user = userService.findByEmail(userDetails.getUsername());
-        model.addAttribute("user", user);
-        return "mypage";
+    if (userDetails == null) {
+        return "redirect:/login"; // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+    }
+    User user = userService.findByEmail(userDetails.getUsername());
+    model.addAttribute("user", user);
+    return "mypage"; // 마이페이지 템플릿 반환
 }
 
     @GetMapping("/logout")
