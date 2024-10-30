@@ -1,4 +1,3 @@
-import json
 import logging
 import mysql.connector
 
@@ -35,6 +34,12 @@ class Chatbot:
                 "만약 없으시다면 '랜덤'을 입력해주세요. 랜덤으로 추천해 드릴게요."
             )
         }
+    
+    def start_new_conversation(self, user_id):
+        self.conversation_state[user_id] = {'stage': 'initial', 'preferences': {}, 'results': [], 'current_index': 0}
+        logger.info(f"Starting new conversation for user {user_id}")
+        return self.start_conversation()
+
 
     def is_valid_genre_or_tag(self, input_text):
         keywords = [keyword.strip() for keyword in input_text.split(',')]
@@ -88,7 +93,7 @@ class Chatbot:
                 state['preferences']['genre'] = user_input
                 state['stage'] = 'category'
                 logger.info(f"User {user_id} provided valid genre/tag: {user_input}")
-                return {"message": "싱글 / 멀티 / 협동 중 선택해 주세요.", "games": []}
+                return {"message": "싱글 / 멀티 / 협동 / PvP / MMO 중 선택해 주세요.", "games": []}
             else:
                 logger.info(f"User {user_id} provided invalid genre/tag: {user_input}")
                 return {
@@ -104,13 +109,17 @@ class Chatbot:
                 }
 
         elif state['stage'] == 'category':
-            if user_input.lower() in ['싱글', '멀티', '협동']:
+           
+            valid_categories = ['싱글', '멀티', '협동', 'pvp', 'mmo']
+
+            if user_input.lower() in valid_categories:
                 state['preferences']['category'] = user_input
                 state['stage'] = 'sort'
                 logger.info(f"User {user_id} provided category: {user_input}")
                 return {"message": "추천순 / 출시일순 / 랜덤 중 선택해 주세요.", "games": []}
             else:
-                return {"message": "죄송합니다. '싱글', '멀티', '협동' 중 하나를 선택해 주세요.", "games": []}
+                return {"message": f"죄송합니다. '싱글', '멀티', '협동', 'PvP', 'MMO' 중 하나를 선택해 주세요.", "games": []}
+
 
         elif state['stage'] == 'sort':
             if user_input.lower() in ['추천순', '출시일순', '랜덤']:
@@ -132,20 +141,23 @@ class Chatbot:
                 message += "다른 목록을 보여드릴까요? (예 / 아니요)" if state['stage'] == 'more' else "다른 랜덤 게임을 더 보여드릴까요? (예 / 아니요)"
                 return {"message": message, "games": []}
 
+        elif state['stage'] == 'end':
+            if user_input.lower() in ['start', '시작']:
+                return self.start_new_conversation(user_id)
+            else:
+                return {"message": "새로운 추천을 원하시면 '시작'을 입력해주세요.", "games": []}
+
         else:
             logger.warning(f"Unexpected stage for user {user_id}: {state['stage']}")
             return self.start_new_conversation(user_id)
 
-    def start_new_conversation(self, user_id):
-        self.conversation_state[user_id] = {'stage': 'initial', 'preferences': {}, 'results': [], 'current_index': 0}
-        logger.info(f"Starting new conversation for user {user_id}")
-        return self.start_conversation()
-
+    
 
     def recommend_games(self, user_id):
         state = self.conversation_state[user_id]
         preferences = state['preferences']
 
+        # 사용자가 입력한 장르나 태그를 분리
         keywords = [keyword.strip().lower() for keyword in preferences['genre'].split(',')]
 
         query = """
@@ -157,24 +169,30 @@ class Chatbot:
         LEFT JOIN game_genre gg ON g.id = gg.game_id
         LEFT JOIN game_tag gt ON g.id = gt.game_id
         LEFT JOIN game_categories gc ON g.id = gc.game_id
-        WHERE gc.categories LIKE %s
         GROUP BY g.id
         HAVING 
         """
 
         having_conditions = []
-        params = [f"%{preferences['category']}%"]
+        params = []
 
+        # 사용자가 입력한 카테고리가 포함된 게임만 필터링
+        having_conditions.append("""
+            LOWER(GROUP_CONCAT(DISTINCT gc.categories SEPARATOR ', ')) LIKE %s
+        """)
+        params.append(f"%{preferences['category'].lower()}%")
+
+        # 장르나 태그 키워드에 대한 필터 추가
         for keyword in keywords:
             having_conditions.append("""
                 (LOWER(GROUP_CONCAT(DISTINCT gg.genre SEPARATOR ', ')) LIKE %s 
-                 OR LOWER(GROUP_CONCAT(DISTINCT gt.tag SEPARATOR ', ')) LIKE %s
-                 OR LOWER(GROUP_CONCAT(DISTINCT gc.categories SEPARATOR ', ')) LIKE %s)
+                 OR LOWER(GROUP_CONCAT(DISTINCT gt.tag SEPARATOR ', ')) LIKE %s)
             """)
-            params.extend([f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"])
+            params.extend([f"%{keyword}%", f"%{keyword}%"])
 
         query += " AND ".join(having_conditions)
 
+        # 정렬 조건에 따른 정렬
         if preferences['sort'] == '추천순':
             query += " ORDER BY g.recommendations DESC"
         elif preferences['sort'] == '출시일순':
@@ -197,7 +215,7 @@ class Chatbot:
                 return "죄송합니다. 조건에 맞는 게임을 찾을 수 없습니다."
 
             return self.show_more_games(user_id)
-        
+
         except mysql.connector.Error as err:
             logger.error(f"Database error in recommend_games: {err}")
             return "죄송합니다. 게임 추천 중 오류가 발생했습니다."
@@ -205,6 +223,8 @@ class Chatbot:
         except Exception as e:
             logger.error(f"Unexpected error in recommend_games: {e}")
             return "죄송합니다. 예기치 못한 오류가 발생했습니다."
+
+
         
 
     def recommend_random_games(self, user_id):
@@ -220,7 +240,6 @@ class Chatbot:
         WHERE g.recommendations >= 5000
         GROUP BY g.id
         ORDER BY RAND()
-        LIMIT 10
         """
 
         try:
@@ -243,6 +262,7 @@ class Chatbot:
         except Exception as e:
             logger.error(f"Unexpected error in recommend_random_games: {e}")
             return "죄송합니다. 예기치 못한 오류가 발생했습니다."
+
     
     def show_more_games(self, user_id):
         state = self.conversation_state[user_id]
@@ -253,14 +273,18 @@ class Chatbot:
         # 현재 결과가 있는지 확인
         if current_results:
             state['current_index'] = end
-            state['stage'] = 'more'
             formatted_results = self.format_game_results(current_results)
 
             # 다음 결과가 있는지 확인
             if end >= len(state['results']):
-                formatted_results['message'] = "이것이 마지막 목록입니다. 새로운 추천을 원하시면 '시작'을 입력해주세요."
+                formatted_results['message'] = "마지막 목록입니다.\n 새로운 추천을 원하시면 '시작'을 입력해주세요."
+                state['stage'] = 'end'  # 새로운 상태 추가
+            else:
+                state['stage'] = 'more'
+                formatted_results['message'] = "다른 목록을 보여드릴까요? (예 / 아니요)"
         else:
-            formatted_results = {"message": "더 이상 추천할 게임이 없습니다. 새로운 추천을 원하시면 '시작'을 입력해주세요", "games": []}
+            formatted_results = {"message": "더 이상 추천할 게임이 없습니다.\n 새로운 추천을 원하시면 '시작'을 입력해주세요", "games": []}
+            state['stage'] = 'end'  # 새로운 상태 추가
 
         return formatted_results
     
@@ -270,7 +294,7 @@ class Chatbot:
         current_index = state['current_index']
     
         if current_index >= len(results):
-            return {"message": "더 이상 추천할 랜덤 게임이 없습니다. 새로운 추천을 원하시면 '시작'을 입력해주세요.", "games": []}
+            return {"message": "더 이상 추천할 랜덤 게임이 없습니다.\n 새로운 추천을 원하시면 '시작'을 입력해주세요.", "games": []}
     
         end_index = min(current_index + 5, len(results))
         games_to_show = results[current_index:end_index]
@@ -282,7 +306,7 @@ class Chatbot:
         if end_index < len(results):
             response["message"] = "다른 랜덤 게임을 더 보여드릴까요? (예 / 아니요)"
         else:
-            response["message"] = "더 이상 추천할 랜덤 게임이 없습니다. 새로운 추천을 원하시면 '시작'을 입력해주세요."
+            response["message"] = "더 이상 추천할 랜덤 게임이 없습니다.\n 새로운 추천을 원하시면 '시작'을 입력해주세요."
     
         return response
 
@@ -294,6 +318,7 @@ class Chatbot:
                 "name": game['name'],
                 "app_id": game['app_id'],
                 "release_date": game['release_date'].strftime('%Y-%m-%d'),
+                "categories": game['categories'],
                 "genres": game['genres'],
                 "tags": game['tags']
             }

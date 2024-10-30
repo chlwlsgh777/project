@@ -96,10 +96,11 @@
 
             const details = document.createElement('p');
             details.innerHTML = `
-            <strong>앱 ID:</strong> ${game.app_id || 'N/A'}<br>
-            <strong>출시일:</strong> ${game.release_date || 'N/A'}<br>
-            <strong>장르:</strong> ${game.genres || 'N/A'}<br>
-            <strong>태그:</strong> ${game.tags || 'N/A'}
+            <strong style="color: black;">앱 ID :</strong> ${game.app_id || 'N/A'}<br>
+            <strong style="color: black;">출시일 :</strong> ${game.release_date || 'N/A'}<br><br>
+            <strong style="color: black;">카테고리 :</strong> ${game.categories || 'N/A'}<br><br>
+            <strong style="color: black;">장르 :</strong> ${game.genres || 'N/A'}<br><br>
+            <strong style="color: black;">태그 :</strong> ${game.tags || 'N/A'}
         `;
             gameBox.appendChild(details);
 
@@ -139,6 +140,8 @@
 
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
+
+    
 
 
 
