@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: rgb(25, 32, 48);
+            color: #ffffff;
+            margin: 0;
+            padding-left: 220px; /* 네비게이션 바 너비 + 여백 */
+            min-height: 100vh;
+            overflow-x: hidden; /* 가로 스크롤 방지 */
+        }
+
+        #header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-top: 20px; /* 상단 여백 추가 */
+        }
+
+        .main-content {
+            width: calc(100% - 220px);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .box {
+            background-color: #3c3c3c; /* 박스 배경색 */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px; /* 박스 간격 */
+        }
+
+        /* 스크롤바 스타일링 */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* 폼 스타일 */
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            color: #333;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* 메시지 스타일 */
+        .success-message, .error-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .success-message {
+            background-color: #dff0d8; 
+            color: #3c763d; 
+        }
+
+        .error-message {
+            background-color: #f2dede; 
+            color: #a94442; 
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            body {
+                padding-left: 0; /* 모바일에서는 왼쪽 패딩 제거 */
+            }
+
+            .main-content {
+                width: 100%; /* 전체 너비 사용 */
+                padding: 10px; /* 패딩 조정 */
+                box-sizing: border-box; /* 박스 모델 조정 */
+            }
+            
+            #header {
+                padding-top: 10px; /* 상단 여백 조정 */
+            }
+            
+             .box {
+                padding-left :5%; 
+                padding-right :5%;
+             }
+             
+             input[type="text"]{
+                 width :90%;
+             }
+             
+             button{
+                 width :90%;
+             }
+             
+             label{
+                 font-size : small; 
+             }
+             
+             h2{
+                 font-size : medium; 
+             }
+             
+             h3{
+                 font-size : small; 
+             }
+             
+             .success-message, .error-message{
+                 font-size : small; 
+             }
+             
+             button:hover{
+                 font-size : small; 
+             }
+             
+             button{
+                 font-size : small; 
+             }      
+        
+    }
+    </style>
+        <link rel="stylesheet" th:href="@{/css/main.css}">
+        <link rel="stylesheet" th:href="@{/css/nav.css}">
+</head>
+<body>
+    <div th:replace="~{nav :: global-nav}"></div>
+    <div id="header">
+        <h1>마이페이지</h1>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="box">
+            <div class="user-info">
+                <h2>사용자 정보</h2>
+                <p>안녕하세요, <span th:text="${user.name}"></span>님!</p>
+                <p>이메일: <span th:text="${user.email}"></span></p>
+                <p>현재 닉네임: <span th:text="${user.nickname}"></span></p>
+            </div>
+    
+            <p>닉네임 변경
+            <form id="nicknameForm" th:action="@{/update-nickname}" method="post">
+                <label for="newNickname">새 닉네임:</label>
+                <input type="text" id="newNickname" name="newNickname" required placeholder="새 닉네임을 입력하세요">
+                <button type="button" id="checkNickname">중복 확인</button>
+                <span id="nicknameCheckResult"></span>
+                <button type="submit" id="updateNickname" disabled>변경</button>
+            </form>
+            </p>
+        </div>
+
+         <form th:action="@{/logout}" method="post">
+              <button type="submit">로그아웃</button>
+         </form>
+
+         <!-- 성공 메시지 표시 -->
+         <div th:if="${success}" class="success-message" th:text="${success}"></div>
+
+         <!-- 에러 메시지 표시 -->
+         <div th:if="${error}" class="error-message" th:text="${error}"></div>
+    </div>
+
+    <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkNicknameButton = document.getElementById('checkNickname');
+        const newNicknameInput = document.getElementById('newNickname');
+        const nicknameCheckResult = document.getElementById('nicknameCheckResult');
+        const updateNicknameButton = document.getElementById('updateNickname');
+
+        checkNicknameButton.addEventListener('click', function() {
+            const newNickname = newNicknameInput.value;
+            if (newNickname) {
+                fetch('/check-nickname', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nickname: newNickname })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.available) {
+                        nicknameCheckResult.textContent = '사용 가능한 닉네임입니다.';
+                        nicknameCheckResult.style.color = 'green';
+                        updateNicknameButton.disabled = false;
+                    } else {
+                        nicknameCheckResult.textContent = '이미 사용 중인 닉네임입니다.';
+                        nicknameCheckResult.style.color = 'red';
+                        updateNicknameButton.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    nicknameCheckResult.textContent = '중복 확인 중 오류가 발생했습니다.';
+                    nicknameCheckResult.style.color = 'red';
+                    updateNicknameButton.disabled = true;
+                });
+            } else {
+                nicknameCheckResult.textContent = '닉네임을 입력해주세요.';
+                nicknameCheckResult.style.color = 'red';
+                updateNicknameButton.disabled = true;
+            }
+        });
+
+        newNicknameInput.addEventListener('input', function() {
+            updateNicknameButton.disabled = true;
+            nicknameCheckResult.textContent = '';
+        });
+    });
+    </script>
+</body>
+</html>
