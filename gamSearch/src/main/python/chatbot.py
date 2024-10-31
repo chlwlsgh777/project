@@ -1,5 +1,6 @@
 import logging
 import mysql.connector
+from genre_tag_mapping import genre_tag_mapping
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ class Chatbot:
             )
             self.cursor = self.db.cursor(dictionary=True)
             logger.info("Database connected successfully")
+        
         except mysql.connector.Error as err:
             logger.error(f"Database connection failed: {err}")
             self.db = None
@@ -22,6 +24,13 @@ class Chatbot:
         
         self.conversation_state = {}
 
+    
+    def normalize_input(self, user_input):
+        # 사용자가 입력한 장르/태그를 매핑 딕셔너리로 표준화
+        keywords = [genre_tag_mapping.get(word.strip().lower(), word.strip()) for word in user_input.split(',')]
+        return ', '.join(keywords)
+
+    # 챗봇 첫 부분 실행하는 함수
     def start_new_conversation(self, user_id):
         self.conversation_state[user_id] = {'stage': 'initial', 'preferences': {}, 'results': [], 'current_index': 0}
         logger.info(f"Starting new conversation for user {user_id}")
@@ -37,6 +46,7 @@ class Chatbot:
             )
         }
 
+    # 입력받은 장르나 태그가 DB에 존재하는지 확인하는 함수 (여러개를 입력했을 경우 여러개를 모두 포함한 정보를 미리 검색해봄)
     def is_valid_genre_or_tag(self, input_text):
         keywords = [keyword.strip() for keyword in input_text.split(',')]
         placeholders = ' AND '.join(['EXISTS (SELECT 1 FROM (SELECT genre AS term FROM game_genre UNION SELECT tag AS term FROM game_tag) AS terms WHERE term LIKE %s)'] * len(keywords))
@@ -66,10 +76,15 @@ class Chatbot:
             logger.error(f"Error executing query in is_valid_genre_or_tag: {e}")
             return False
 
+
+    # 응답 생성하는 함수
     def generate_response(self, user_id, user_input):
+        user_input = self.normalize_input(user_input)
+
         logger.info(f"Generating response for user {user_id} with input: {user_input}")
 
-        if user_input.lower() in ['start', '시작', '다시 질문하기']:
+        
+        if user_input.lower() in ['다시 질문하기']:
             return self.start_new_conversation(user_id)
 
         if user_id not in self.conversation_state:
@@ -78,15 +93,26 @@ class Chatbot:
         state = self.conversation_state[user_id]
         logger.info(f"Current state for user {user_id}: {state}")
 
+        # 버튼 생성시 필요한 리스트(리스트에 입력한 요소들 전부 버튼으로 생성됨)
+        valid_categories = ['싱글', '멀티', '협동', 'pvp', 'mmo']
+        valid_sort_options = ['추천순', '출시일순', '랜덤'] # sort 옵션을 추가할 경우  recommend_games 함수에 ORDER BY 쿼리를 추가해 줘야함.
+
+        # 사용자 입력 받는 첫 단계
         if state['stage'] == 'initial':
+            
+            # 랜덤 입력을 받았을 때
             if user_input.lower() == '랜덤':
                 logger.info(f"User {user_id} requested random games")
                 return self.recommend_random_games(user_id)
+            
+            # 사용자 입력을 받았을때 DB 확인후 state를  'category'로 변경 
             elif self.is_valid_genre_or_tag(user_input):
-                state['preferences']['genre'] = user_input
+                state['preferences']['genre_or_tag'] = user_input
                 state['stage'] = 'category'
                 logger.info(f"User {user_id} provided valid genre/tag: {user_input}")
-                return {"message": "핵심 카테고리를 선택해주세요", "games": []}
+                return {"message": "핵심 카테고리를 선택해주세요", "games": [], "buttons": valid_categories}
+            
+            # DB 확인후 일치하는 정보가 없을때
             else:
                 logger.info(f"User {user_id} provided invalid genre/tag: {user_input}")
                 return {
@@ -101,18 +127,23 @@ class Chatbot:
                     "games": []
                 }
 
+        # state 'category' 일때
         elif state['stage'] == 'category':
-            valid_categories = ['싱글', '멀티', '협동', 'pvp', 'mmo']
+            
+            # valid_categories 에 존재하는 카테고리를 입력받았을때 state 를 sort 로 변경
             if user_input.lower() in valid_categories:
                 state['preferences']['category'] = user_input
                 state['stage'] = 'sort'
                 logger.info(f"User {user_id} provided category: {user_input}")
-                return {"message": "정렬 방식을 선택해 주세요", "games": []}
+                return {"message": "정렬 방식을 선택해 주세요", "games": [], "buttons": valid_sort_options}
             else:
                 return {"message": "죄송합니다. 핵심 카테고리 중 하나를 선택해 주세요.", "games": [], "buttons": valid_categories}
 
+
+        # state 'sort' 일때
         elif state['stage'] == 'sort':
-            valid_sort_options = ['추천순', '출시일순', '랜덤']
+            
+            # valid_sort_options 에 존재하는 정렬방식을 입력 받았을때 입력받은 정보를 토대로 recommend_games 함수 실행.
             if user_input.lower() in valid_sort_options:
                 state['preferences']['sort'] = user_input
                 logger.info(f"User {user_id} provided sort preference: {user_input}")
@@ -120,9 +151,13 @@ class Chatbot:
             else:
                 return {"message": "죄송합니다. 정렬 방식 중 하나를 선택해 주세요.", "games": [],"buttons": valid_sort_options}
         
+
+        # 결과가 존재하지 않을때
         elif state['stage'] == 'no_results':
             return {"message": "새로운 추천을 받으려면 '다시 질문하기'를 눌러주세요.", "games": [] , "buttons": ['다시 질문하기']}
         
+
+        # 목록 더보기
         elif state['stage'] in ['more', 'more_random']:
             if user_input.lower() == '예':
                 logger.info(f"User {user_id} requested more games")
@@ -141,10 +176,12 @@ class Chatbot:
             logger.warning(f"Unexpected stage for user {user_id}: {state['stage']}")
             return self.start_new_conversation(user_id)
 
+
+    # 입력받은 조건을 토대로 게임을 검색하고 results 에 저장하는 함수
     def recommend_games(self, user_id):
         state = self.conversation_state[user_id]
         preferences = state['preferences']
-        keywords = [keyword.strip().lower() for keyword in preferences['genre'].split(',')]
+        keywords = [keyword.strip().lower() for keyword in preferences['genre_or_tag'].split(',')]
 
         query = """
         SELECT g.name, g.app_id, g.release_date, g.recommendations,
@@ -194,6 +231,7 @@ class Chatbot:
             logger.error(f"Database error in recommend_games: {err}")
             return "죄송합니다. 게임 추천 중 오류가 발생했습니다."
 
+    # 첫 입력에 랜덤을 입력했을때 실행되는 함수
     def recommend_random_games(self, user_id):
         query = """
         SELECT g.name, g.app_id, g.release_date, g.recommendations,
@@ -227,6 +265,8 @@ class Chatbot:
             logger.error(f"Database error in recommend_random_games: {err}")
             return "죄송합니다. 랜덤 게임 추천 중 오류가 발생했습니다."
 
+
+    # 추천 목록 더 볼때 실행되는 함수
     def show_more_games(self, user_id, is_random=False):
         state = self.conversation_state[user_id]
         results = state['results']
@@ -262,6 +302,7 @@ class Chatbot:
             "buttons": buttons
         }
 
+    # 결과를 저장하는 함수 
     def format_game_results(self, results):
         return [
             {
