@@ -156,7 +156,6 @@ class Chatbot:
         elif state['stage'] == 'no_results':
             return {"message": "새로운 추천을 받으려면 '다시 질문하기'를 눌러주세요.", "games": [] , "buttons": ['다시 질문하기']}
         
-
         # 목록 더보기
         elif state['stage'] in ['more', 'more_random']:
             if user_input.lower() == '예':
