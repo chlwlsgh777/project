@@ -39,6 +39,9 @@ public class User {
     @JsonIgnore
     private String password;
 
+    @Column(nullable=false, unique = true, length=12)
+    private String nickname;
+
 
     
     //email과 password로 로그인

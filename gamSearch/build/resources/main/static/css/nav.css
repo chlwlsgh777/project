@@ -8,10 +8,12 @@
     position: fixed; /* 고정 위치 */
     left: 0;
     top: 0;
+    bottom: 0;
     box-shadow: 2px 0 5px rgba(0,0,0,0.5);
     align-items: flex-start;
     justify-content: flex-start;
     z-index: 1000;
+    overflow-y: auto;
 }
 
 .global-nav a {
@@ -32,7 +34,7 @@
 /* 접근성 향상을 위한 포커스 상태 */
 .global-nav a:focus,
 .nav-auth button:focus {
-    outline: 2px solid #ffffff; /* 포커스 시 흰색 테두리 */
+    outline: 2px solid #555; /* 포커스 시 흰색 테두리 */
 }
 
 .nav-auth {
@@ -94,15 +96,36 @@ body {
     color: #ffffff;
     margin: 0;
     padding-left: 220px; /* 네비게이션 바 너비 + 여백 */
+    min-height: 100vh; /* 새로 추가: 최소 높이를 뷰포트 높이로 설정 */
+    display: flex; /* 새로 추가 */
+    flex-direction: column; /* 새로 추가 */
 }
 
 .main-content {
     flex-grow: 1; /* 메인 콘텐츠가 남은 공간을 차지하도록 설정 */
+    padding: 20px; /* 새로 추가: 내용과 네비게이션 바 사이의 간격 */
 }
 
+/* 반응형 디자인 수정 */
 @media (max-width: 768px) {
+    .global-nav {
+        width: 100%; /* 수정: 모바일에서는 전체 너비로 */
+        height: auto;
+        position: relative; /* 수정: 고정 위치 해제 */
+        padding: 10px;
+    }
+
     body {
-        padding-left: 220px; /* 여전히 왼쪽 패딩 유지 (네비게이션 바 너비) */
-        padding-top: 0; /* 상단 패딩 제거 (필요 시 조정 가능) */
+        padding-left: 0; /* 수정: 왼쪽 패딩 제거 */
+        padding-top: 0; /* 수정: 상단 패딩 제거 */
+    }
+
+    .main-content {
+        padding: 10px; /* 새로 추가: 모바일에서 패딩 조정 */
+    }
+
+    .global-nav a, .nav-auth {
+        width: calc(100% - 20px);
+        padding: 10px;
     }
 }

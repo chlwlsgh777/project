@@ -1,7 +1,7 @@
 <nav th:fragment="global-nav" class="global-nav">
     <div class="nav-auth">
         <div sec:authorize="isAuthenticated()">
-            <span th:text="${#authentication.name} + '님 환영합니다'">사용자님 환영합니다</span>
+            <span th:text="${session.userName} + '님 환영합니다'">사용자님 환영합니다</span>
             <div style="display:flex; margin-top:5px;">
                 <button onclick="location.href='/mypage'" class="nav-button" style="flex:1; margin-right:5px;">마이페이지</button>
                 <form th:action="@{/logout}" method="post" style="flex:1; margin:0;">
