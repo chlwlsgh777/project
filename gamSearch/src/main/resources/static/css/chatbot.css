@@ -116,7 +116,7 @@
     justify-content: center; /* 가운데 정렬 */
     flex-wrap: wrap; /* 버튼이 넘칠 경우 다음 줄로 넘기기 */
     padding: 10px;
-    background-color: #333;
+    background-color: rgb(25, 32, 48);
     margin-top: 10px;
     border-radius: 10px;
 }
