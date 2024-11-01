@@ -84,7 +84,7 @@ class Chatbot:
         logger.info(f"Generating response for user {user_id} with input: {user_input}")
 
         
-        if user_input.lower() in ['다시 질문하기']:
+        if user_input.lower() in ['다시 질문하기', 'start']:
             return self.start_new_conversation(user_id)
 
         if user_id not in self.conversation_state:
