@@ -1,0 +1,110 @@
+#chat-wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto; 
+}
+
+#chat-container {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+}
+
+#chat-messages {
+    height: 550px;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    margin-bottom: 10px;
+    max-width: 70%;
+}
+
+.user-message {
+    background-color: #4caf50;
+    align-self: flex-end;
+    border-radius: 15px 0 15px 15px;
+    padding: 10px;
+    color: white;
+}
+
+.bot-message {
+    background-color: #007bff;
+    color: #ffffff;
+    align-self: flex-start;
+    border-radius: 0 15px 15px 15px;
+    padding: 10px;
+}
+
+#user-input {
+    display: flex;
+    padding: 10px;
+    background-color: #333;
+    align-items: center; /* 수직 정렬을 위해 추가 */
+}
+
+#user-input input {
+    flex-grow: 1;
+    border: none;
+    padding: 10px 15px; /* 좌우 패딩 증가 */
+    border-radius: 20px;
+    background-color: #666;
+    color: white;
+    font-size: 16px; /* 폰트 크기 지정 */
+    margin-right: 10px; /* 버튼과의 간격 */
+}
+
+#user-input button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    padding: 10px 20px; /* 패딩 증가 */
+    font-size: 16px; /* 폰트 크기 지정 */
+    transition: background-color 0.3s; /* 부드러운 호버 효과 */
+}
+
+#user-input button:hover {
+    background-color: #45a049; /* 호버 시 색상 변경 */
+}
+
+.game-box {
+    background-color: #007bff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.game-box h3 {
+    color: #4caf50;
+    margin-top: 0;
+}
+
+.game-box p {
+    margin-bottom: 0;
+}
+
+.button-container { /* 버튼 컨테이너 스타일 */
+   display:flex; 
+   justify-content :flex-end; /* 오른쪽 정렬 */
+   margin-top :10px; 
+}
+
+.button-container button { /* 버튼 스타일 */
+   background-color :#4caf50; 
+   color:white; 
+   border:none; 
+   border-radius :20px; /* 둥근 모서리 */
+   cursor:pointer; 
+   padding :8px 12px; 
+   margin :2px; 
+   font-size :0.9em; 
+}
+
+.button-container button:hover { /* 버튼 호버 스타일 */
+   background-color :#45a049; 
+}
