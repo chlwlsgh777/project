@@ -1,81 +1,219 @@
-.global-nav {
-    display: flex;
-    flex-direction: column;
-    background-color: rgb(8,12,22);
-    padding: 20px;
-    width: 200px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-    align-items: flex-start;
-    justify-content: flex-start;
-    z-index: 1000;
-    overflow-y: auto;
-}
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: rgb(25, 32, 48);
+            color: #ffffff;
+            margin: 0;
+            padding-left: 220px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.global-nav a {
-    color: #ffffff;
-    text-decoration: none;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    width: calc(100% - 40px);
-    text-align: left;
-}
+        .registration-container {
+            background-color: #3c3c3c;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 320px;
+        }
 
-.global-nav a:hover {
-    background-color: #444;
-}
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-.global-nav a:focus,
-.nav-auth button:focus {
-    outline: 2px solid #555;
-}
+        .input-group {
+            margin-bottom: 20px;
+        }
 
-.nav-auth {
-    padding-top: 10px;
-    border-top: 1px solid #444;
-    width: 100%;
-}
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
 
-.nav-auth span, .nav-auth button, .nav-auth a {
-    color: #ffffff;
-    display: block;
-    margin-bottom: 5px;
-    text-align: left;
-}
+        .input-container {
+            position: relative;
+            width: 100%;
+        }
 
-.nav-auth button {
-    background-color: #444;
-    border: none;
-    padding: 8px 10px;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    border-radius: 5px;
-}
+        .input-container input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #555;
+            color: #fff;
+            box-sizing: border-box;
+        }
 
-.nav-auth button:hover {
-    background-color: #555;
-}
+        .input-container button {
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            right: 0px;
+            padding: 0 10px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
 
-@media (max-width: 768px) {
-    .global-nav {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 10px;
-    }
+        .input-container button:hover {
+            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
+        }
 
-    .global-nav a, .nav-auth {
-        margin-bottom: 5px;
-        padding-left: 10px;
-        padding-right: 10px;
-        width: calc(100% - 20px);
-        text-align: left;
-    }
-}
+        .submit-button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .submit-button:hover {
+            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
+        }
+
+        .check-result {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-left: 0;
+            }
+
+            .registration-container {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+</head>
+<body>
+    <div th:replace="~{nav :: global-nav}"></div>
+    <div class="registration-container">
+        <h2>회원가입</h2>
+
+        <form th:action="@{/register}" th:object="${user}" method="post">
+            <div class="input-group">
+                <label for="name">이름:</label>
+                <div class="input-container">
+                    <input type="text" id="name" th:field="*{name}" required placeholder="이름을 입력하세요">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="email">이메일:</label>
+                <div class="input-container">
+                    <input type="email" id="email" th:field="*{email}" required placeholder="이메일을 입력하세요">
+                    <button id="btnCheckEmail" type="button">중복확인</button>
+                </div>
+                <span id="checkResult" class="check-result"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="nickname">닉네임:</label>
+                <div class="input-container">
+                    <input type="text" id="newNickname" th:field="*{nickname}" required placeholder="닉네임을 입력하세요">
+                    <button id="checkNickname" type="button">중복확인</button>
+                </div>
+                <span id="nicknameCheckResult" class="check-result"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="password">비밀번호:</label>
+                <div class="input-container">
+                    <input type="password" id="password" th:field="*{password}" required placeholder="비밀번호를 입력하세요">
+                </div>
+            </div>
+
+           <button type="submit" class="submit-button">가입하기</button> 
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const $email = document.querySelector('#email');
+        const $checkResult = document.querySelector('#checkResult');
+        const $newNickname = document.querySelector('#newNickname');
+        const $nicknameCheckResult = document.querySelector('#nicknameCheckResult');
+
+        document.querySelector('#btnCheckEmail').addEventListener('click', () => {
+            if ($email.value.length !== 0) {
+                const checkEmail = { email: $email.value };
+                fetch('/check-email', {
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(checkEmail)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.available) {
+                        alert("사용 가능한 이메일입니다.");
+                        $checkResult.textContent = '중복확인완료';
+                        $checkResult.style.color = 'green';
+                    } else {
+                        throw new Error("이미 사용 중인 이메일입니다.");
+                    }
+                })
+                .catch(error => {
+                    alert(error.message);
+                    $email.value = "";
+                    $checkResult.textContent = "";
+                });
+            } else {
+                alert("이메일을 입력하세요");
+            }
+        });
+
+        document.querySelector('#checkNickname').addEventListener('click', () => {
+            const newNickname = $newNickname.value;
+            if (newNickname) {
+                fetch('/check-nickname', {
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nickname: newNickname })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.available) {
+                        $nicknameCheckResult.textContent = '사용 가능한 닉네임입니다.';
+                        $nicknameCheckResult.style.color = 'green';
+                    } else {
+                        $nicknameCheckResult.textContent = '중복된 닉네임입니다.';
+                        $nicknameCheckResult.style.color = 'red';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    $nicknameCheckResult.textContent = '중복 확인 중 오류가 발생했습니다.';
+                    $nicknameCheckResult.style.color = 'red';
+                });
+            } else {
+                $nicknameCheckResult.textContent = '닉네임을 입력해주세요.';
+                $nicknameCheckResult.style.color = 'red';
+            }
+        });
+    });
+    </script>
+</body>
+</html>
