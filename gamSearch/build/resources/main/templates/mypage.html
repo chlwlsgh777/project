@@ -6,20 +6,22 @@
     <title>마이페이지</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
+       body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: rgb(25, 32, 48);
             color: #ffffff;
             margin: 0;
-            padding-left: 220px; /* 네비게이션 바 너비 + 여백 */
+            padding-left: 220px;
             min-height: 100vh;
-            overflow-x: hidden; /* 가로 스크롤 방지 */
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         #header {
             text-align: center;
             margin-bottom: 20px;
-            padding-top: 20px; /* 상단 여백 추가 */
+            padding-top: 20px;
         }
 
         .main-content {
@@ -28,17 +30,17 @@
             margin: 0 auto;
             padding: 20px;
             box-sizing: border-box;
+            flex-grow: 1;
         }
 
         .box {
-            background-color: #3c3c3c; /* 박스 배경색 */
+            background-color: #3c3c3c;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px; /* 박스 간격 */
+            margin-bottom: 20px;
         }
 
-        /* 스크롤바 스타일링 */
         ::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -56,7 +58,6 @@
             background: #555;
         }
 
-        /* 폼 스타일 */
         form {
             margin-bottom: 20px;
         }
@@ -67,7 +68,7 @@
         }
 
         input[type="text"] {
-            width: 100%;
+            width: 94%;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
@@ -76,20 +77,19 @@
             color: #333;
         }
 
-        button {
+        .main-content button {
             padding: 10px 15px;
             border: none;
             border-radius: 5px;
-            background-color: #4CAF50;
+            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
             color: white;
             cursor: pointer;
         }
 
-        button:hover {
-            background-color: #45a049;
+        .main-content button:hover {
+            opacity: 0.9;
         }
 
-        /* 메시지 스타일 */
         .success-message, .error-message {
             padding: 10px;
             margin-bottom: 15px;
@@ -106,60 +106,35 @@
             color: #a94442; 
         }
 
-        /* 반응형 디자인 */
         @media (max-width: 768px) {
             body {
-                padding-left: 0; /* 모바일에서는 왼쪽 패딩 제거 */
+                padding-left: 0;
             }
 
             .main-content {
-                width: 100%; /* 전체 너비 사용 */
-                padding: 10px; /* 패딩 조정 */
-                box-sizing: border-box; /* 박스 모델 조정 */
+                width: 100%;
+                padding: 10px;
             }
             
             #header {
-                padding-top: 10px; /* 상단 여백 조정 */
+                padding-top: 10px;
             }
             
-             .box {
-                padding-left :5%; 
-                padding-right :5%;
-             }
-             
-             input[type="text"]{
-                 width :90%;
-             }
-             
-             button{
-                 width :90%;
-             }
-             
-             label{
-                 font-size : small; 
-             }
-             
-             h2{
-                 font-size : medium; 
-             }
-             
-             h3{
-                 font-size : small; 
-             }
-             
-             .success-message, .error-message{
-                 font-size : small; 
-             }
-             
-             button:hover{
-                 font-size : small; 
-             }
-             
-             button{
-                 font-size : small; 
-             }      
-        
-    }
+            .box {
+                padding-left: 5%;
+                padding-right: 5%;
+            }
+            
+            input[type="text"],
+            .main-content button {
+                width: 90%;
+            }
+            
+            label, .success-message, .error-message,
+            .main-content button, h2, h3 {
+                font-size: small;
+            }
+        }
     </style>
         <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/nav.css}">
@@ -191,9 +166,6 @@
             </p>
         </div>
 
-         <form th:action="@{/logout}" method="post">
-              <button type="submit">로그아웃</button>
-         </form>
 
          <!-- 성공 메시지 표시 -->
          <div th:if="${success}" class="success-message" th:text="${success}"></div>

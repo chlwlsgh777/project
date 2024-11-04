@@ -68,4 +68,8 @@ public class UserService {
         return userRepository.findByEmailOrNickname(emailOrNickname, emailOrNickname)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email or nickname: " + emailOrNickname));
     }
+
+    public User getCurrentUser(String email) {
+        return findByEmail(email);
+    }
 }

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
+import java.security.Principal;
+
 @Controller
 @RequiredArgsConstructor
 public class UserController {
@@ -62,20 +64,11 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public String showLoginForm() {
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String loginUser(@RequestParam String email, @RequestParam String password, 
-                            Model model) {
-        try {
-            userService.loginUser(email, password);
-            return "redirect:/index";
-        } catch (RuntimeException e) {
-            model.addAttribute("error", "이메일 또는 비밀번호가 올바르지 않습니다.");
-            return "login";
+    public String showLoginForm(@RequestParam(required = false) String redirect, Model model) {
+        if (redirect != null && !redirect.isEmpty()) {
+            model.addAttribute("redirect", redirect);
         }
+        return "login";
     }
 
     @GetMapping("/mypage")
@@ -89,8 +82,8 @@ public class UserController {
     }
 
     @PostMapping("/update-nickname")
-    public String updateNickname(@AuthenticationPrincipal UserDetails userDetails, 
-                                 @RequestParam String newNickname, Model model) {
+    public String updateNickname(@AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam String newNickname, Model model) {
         try {
             User user = userService.findByEmail(userDetails.getUsername());
             userService.updateNickname(user, newNickname);
@@ -105,5 +98,13 @@ public class UserController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/index?logout";
+    }
+
+    @GetMapping("/api/check-login")
+    @ResponseBody
+    public ResponseEntity<Map<String, Boolean>> checkLogin(Principal principal) {
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isLoggedIn", principal != null);
+        return ResponseEntity.ok(response);
     }
 }

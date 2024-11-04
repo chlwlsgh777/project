@@ -13,6 +13,9 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.gamesearch.domain.user.CustomUserDetailsService;
+import com.gamesearch.domain.user.CustomUserDetailsService.CustomUserDetails;
+
+import jakarta.servlet.http.HttpSession;
 
 @Configuration
 @EnableWebSecurity
@@ -23,50 +26,56 @@ public class SecurityConfig implements WebMvcConfigurer {
         return new BCryptPasswordEncoder();
     }
 
-   @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/check-email", "/check-nickname","/chat")) // AJAX 요청에 대해 CSRF 비활성화
-        .authorizeHttpRequests(authz -> authz
-            .requestMatchers("/", "/chat", "/index", "/register", "/login", "/check-email", "/chatbot", "/community", "/check-nickname").permitAll()
-            .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-            .anyRequest().authenticated()
-        )
-        .formLogin(form -> form
-            .loginPage("/login")
-            .successHandler(authenticationSuccessHandler())
-            .failureUrl("/login?error=true")
-            .permitAll()
-        )
-        .logout(logout -> logout
-            .logoutSuccessUrl("/")
-            .invalidateHttpSession(true)
-            .deleteCookies("JSESSIONID")
-            .permitAll()
-        )
-        .exceptionHandling(exceptions -> exceptions
-            .accessDeniedPage("/access-denied") // 접근 거부 시 사용자 정의 페이지
-        )
-        .sessionManagement(session -> session
-            .maximumSessions(1)
-            .maxSessionsPreventsLogin(true)
-            .expiredUrl("/login?expired")
-        )
-        .sessionManagement(session -> session
-            .sessionFixation().newSession()
-        );
-    return http.build();
-}
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/check-email", "/check-nickname", "/chat", "/api/check-login"))
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/", "/chat", "/index", "/register", "/login", "/check-email", "/chatbot",
+                                "/community", "/check-nickname", "/api/check-login", "/community/**")
+                        .permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .successHandler(authenticationSuccessHandler())
+                        .failureUrl("/login?error=true")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll())
+                .exceptionHandling(exceptions -> exceptions
+                        .accessDeniedPage("/access-denied"))
+                .sessionManagement(session -> session
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true)
+                        .expiredUrl("/login?expired"))
+                .sessionManagement(session -> session
+                        .sessionFixation().newSession());
+        return http.build();
+    }
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return (request, response, authentication) -> {
+            HttpSession session = request.getSession();
             if (authentication.getPrincipal() instanceof CustomUserDetailsService.CustomUserDetails userDetails) {
-                request.getSession().setAttribute("userName", userDetails.getName());
+                
+                // 만약 사용자의 실제 이름을 저장하고 싶다면, CustomUserDetails에 getName() 메서드를 추가하고 아래와 같이 사용
+                session.setAttribute("userName", ((CustomUserDetails)
+                userDetails).getName());
             }
-            response.sendRedirect("/");
-        };  
+
+            String redirectUrl = request.getParameter("redirect");
+            if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                response.sendRedirect(redirectUrl);
+            } else {
+                response.sendRedirect("/");
+            }
+        };
     }
 
     @Bean

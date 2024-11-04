@@ -108,3 +108,31 @@
 .button-container button:hover { /* 버튼 호버 스타일 */
    background-color :#45a049; 
 }
+
+
+
+#quick-buttons {
+    display: flex;
+    justify-content: center; /* 가운데 정렬 */
+    flex-wrap: wrap; /* 버튼이 넘칠 경우 다음 줄로 넘기기 */
+    padding: 10px;
+    background-color: rgb(25, 32, 48);
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+#quick-buttons button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin: 5px; /* 버튼 간격 */
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+}
+
+#quick-buttons button:hover {
+    background-color: #45a049;
+}
