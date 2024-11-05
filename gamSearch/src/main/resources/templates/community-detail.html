@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>게시글 상세</title>
@@ -7,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
 </head>
+
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
 
@@ -16,19 +18,48 @@
         <p>작성일: <span th:text="${#temporals.format(community.date, 'yyyy-MM-dd HH:mm')}"></span></p>
         <p>카테고리: <span th:text="${community.category}"></span></p>
         <div th:text="${community.description}">게시글 내용</div>
-        <a href="#" onclick="goBack(); return false;">돌아가기</a>
+
+        <!-- 수정 및 삭제 버튼 (작성자에게만 표시) -->
+        <div th:if="${#authentication.principal.username == community.author.email}">
+            <button onclick="editPost()" class="btn-edit">수정</button>
+            <button onclick="deletePost()" class="btn-delete">삭제</button>
+        </div>
+
+        <a th:href="@{/community(category=${community.category})}" class="btn-list">목록으로</a>
     </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var communityId = /*[[${community.id}]]*/ 0;
+
+        function editPost() {
+            window.location.href = /*[[@{/community/edit/} + ${community.id}]]*/ '/community/edit/0';
+        }
+
+        function deletePost() {
+            if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+                fetch('/community/' + communityId, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': /*[[${_csrf.token}]]*/ ''
+                    }
+                })
+                    .then(function (response) {
+                        if (response.ok) {
+                            alert('게시글이 삭제되었습니다.');
+                            window.location.href = /*[[@{/community}]]*/ '/community';
+                        } else {
+                            alert('게시글 삭제에 실패했습니다.');
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('Error:', error);
+                        alert('오류가 발생했습니다.');
+                    });
+            }
+        }
+        /*]]>*/
+    </script>
 </body>
 
-<script>
-    function goBack() {
-        // 브라우저 히스토리에 이전 페이지가 있는 경우
-        if(document.referrer.indexOf(window.location.host) !== -1) {
-            history.back();
-        } else {
-            // 이전 페이지가 없는 경우 (예: 직접 URL을 통해 접근한 경우)
-            window.location.href = '/community';
-        }
-    }
-    </script>
 </html>

@@ -73,4 +73,21 @@ public class CommunityService {
         }
     }
 
+    @Transactional
+    public void updateCommunity(Long id, Community updatedCommunity) {
+        Community community = communityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        // 수정 가능한 필드들만 업데이트
+        community.setTitle(updatedCommunity.getTitle());
+        community.setDescription(updatedCommunity.getDescription());
+        community.setCategory(updatedCommunity.getCategory());
+
+        // 변경된 엔티티는 자동으로 데이터베이스에 반영됩니다 (더티 체킹)
+    }
+
+    public void deleteCommunity(Long id) {
+        communityRepository.deleteById(id);
+    }
+
 }

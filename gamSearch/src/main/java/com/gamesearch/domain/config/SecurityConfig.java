@@ -63,10 +63,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         return (request, response, authentication) -> {
             HttpSession session = request.getSession();
             if (authentication.getPrincipal() instanceof CustomUserDetailsService.CustomUserDetails userDetails) {
-                
-                // 만약 사용자의 실제 이름을 저장하고 싶다면, CustomUserDetails에 getName() 메서드를 추가하고 아래와 같이 사용
-                session.setAttribute("userName", ((CustomUserDetails)
-                userDetails).getName());
+                session.setAttribute("userName", ((CustomUserDetails) userDetails).getName());
             }
 
             String redirectUrl = request.getParameter("redirect");

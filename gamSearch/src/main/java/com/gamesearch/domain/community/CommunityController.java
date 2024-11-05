@@ -3,6 +3,8 @@ package com.gamesearch.domain.community;
 import java.security.Principal;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -55,10 +57,48 @@ public class CommunityController {
     }
 
     @GetMapping("/{id}")
-    public String viewCommunity(@PathVariable Long id, Model model) {
-        Community community = communityService.getCommunityByIdAndIncrementViewCount(id);
+    public String viewCommunity(@PathVariable Long id, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login?redirect=/community/" + id;
+        }
+        Community community = communityService.getCommunityById(id);
         model.addAttribute("community", community);
+        if (principal != null) {
+            model.addAttribute("currentUserEmail", principal.getName());
+        }
         return "community-detail";
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCommunity(@PathVariable Long id, Principal principal) {
+        Community community = communityService.getCommunityById(id);
+        if (community.getAuthor().getEmail().equals(principal.getName())) {
+            communityService.deleteCommunity(id);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
+        }
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model, Principal principal) {
+        Community community = communityService.getCommunityById(id);
+        if (!community.getAuthor().getEmail().equals(principal.getName())) {
+            return "redirect:/community/" + id + "?error=unauthorized";
+        }
+        model.addAttribute("community", community);
+        return "community-edit";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateCommunity(@PathVariable Long id, @ModelAttribute Community updatedCommunity,
+            Principal principal) {
+        Community community = communityService.getCommunityById(id);
+        if (!community.getAuthor().getEmail().equals(principal.getName())) {
+            return "redirect:/community/" + id + "?error=unauthorized";
+        }
+        communityService.updateCommunity(id, updatedCommunity);
+        return "redirect:/community/" + id;
     }
 
 }
