@@ -1,0 +1,63 @@
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: rgb(25, 32, 48);
+    color: #ffffff;
+    margin: 0;
+    padding-left: 220px; /* 네비게이션 바 너비 + 여백 */
+    min-height: 100vh;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
+}
+
+#header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-top: 20px; /* 상단 여백 추가 */
+}
+
+.main-content {
+    width: calc(100% - 220px);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    body {
+        padding-left: 0; /* 모바일에서는 왼쪽 패딩 제거 */
+    }
+
+    .global-nav {
+        width: 100%; /* 네비게이션 바를 전체 너비로 */
+        height: auto;
+        position: relative; /* 고정 위치 해제 */
+    }
+
+    .main-content {
+        width: 100%; /* 전체 너비 사용 */
+        padding: 10px; /* 패딩 조정 */
+    }
+
+    #header {
+        padding-top: 10px; /* 상단 여백 조정 */
+    }
+}
