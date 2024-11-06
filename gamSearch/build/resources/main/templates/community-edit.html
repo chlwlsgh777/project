@@ -1,38 +1,78 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>게시글 수정</title>
-    <link rel="stylesheet" th:href="@{/css/community.css}">
+    <link rel="stylesheet" th:href="@{/css/community-edit.css}"> <!-- community-edit.css로 변경 -->
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
 </head>
+
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
 
     <div class="community-layout">
-        <h2>게시글 수정</h2>
-        <form th:action="@{/community/edit/{id}(id=${community.id})}" method="post" th:object="${community}">
-            <div>
-                <label for="category">카테고리:</label>
-                <select id="category" th:field="*{category}">
-                    <option value="자유">자유</option>
-                    <option value="모집">모집</option>
-                    <option value="후기">후기</option>
-                    <option value="공략">공략</option>
-                </select>
-            </div>
-            <div>
-                <label for="title">제목:</label>
-                <input type="text" id="title" th:field="*{title}" required>
-            </div>
-            <div>
-                <label for="description">내용:</label>
-                <textarea id="description" th:field="*{description}" required></textarea>
-            </div>
-            <button type="submit">수정 완료</button>
-            <a th:href="@{/community/{id}(id=${community.id})}">취소</a>
-        </form>
+        <div class="community-detail">
+            <h2>게시글 수정</h2>
+            <form th:action="@{/community/edit/{id}(id=${community.id})}" method="post" th:object="${community}">
+                <div>
+                    <label for="category">카테고리 :</label>
+                    <select id="category" th:field="*{category}">
+                        <option value="자유">자유</option>
+                        <option value="모집">모집</option>
+                        <option value="후기">후기</option>
+                        <option value="공략">공략</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="title">제목 :</label>
+                    <br>
+                    <input type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요. 제목은 최대 50자까지 가능합니다."
+                        required maxlength="50">
+                    <br>
+                </div>
+                <div>
+                    <br>
+                    <label for="description">내용 :</label>
+                    <br>
+                    <!-- 4000자 글자 수 제한 및 실시간 글자 수 표시 -->
+                    <textarea id="description" th:field="*{description}" required maxlength="4000"
+                        placeholder="글자수는 최대 4000자 입니다." oninput="updateCharacterCount()"></textarea>
+                    <div class="char-count-container">
+                        <div id="charCount">0 / 4000자</div>
+                    </div>
+                </div>
+                <div class="community-detail-actions">
+                    <button type="button" class="btn-cancel"
+                        th:onclick="'window.location.href=\'' + @{/community/{id}(id=${community.id})} + '\''">취소</button>
+                    <button type="submit" class="btn-submit">수정하기</button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <script>
+        // 실시간 글자 수 업데이트 함수
+        function updateCharacterCount() {
+            const textarea = document.getElementById('description');
+            const charCount = document.getElementById('charCount');
+            const maxLength = 4000;
+
+            const currentLength = textarea.value.length;
+            charCount.textContent = `${currentLength} / ${maxLength}자`;
+
+            // 글자 수 초과 시 경고 색상으로 변경
+            if (currentLength >= maxLength) {
+                charCount.style.color = 'red';
+            } else {
+                charCount.style.color = 'white';
+            }
+        }
+
+        // 페이지 로드 시 기존 내용의 글자 수를 미리 표시
+        document.addEventListener("DOMContentLoaded", updateCharacterCount);
+    </script>
 </body>
+
 </html>
