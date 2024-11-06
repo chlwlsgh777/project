@@ -17,29 +17,48 @@ import lombok.RequiredArgsConstructor;
 public class CommunityController {
     private final CommunityService communityService;
 
-    @GetMapping
-    public String communityPage(Model model,
-            @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "전체") String category) {
-        int size = 20; // 페이지당 게시물 수
-        Page<Community> communityPage;
 
-        if (search != null && !search.isEmpty()) {
-            communityPage = communityService.searchCommunities(category, search, page, size);
-        } else if (!category.equals("전체")) {
-            communityPage = communityService.getCommunityByCategory(category, page, size);
-        } else {
-            communityPage = communityService.getAllCommunities(page, size);
+
+        @GetMapping
+        public String communityPage(Model model,
+                @RequestParam(required = false) String search,
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "전체") String category) {
+            int size = 5; // 페이지당 게시물 수
+            Page<Community> communityPage;
+
+            if (search != null && !search.isEmpty()) {
+                communityPage = communityService.searchCommunities(category, search, page, size);
+            } else if (!category.equals("전체")) {
+                communityPage = communityService.getCommunityByCategory(category, page, size);
+            } else {
+                communityPage = communityService.getAllCommunities(page, size);
+            }
+
+            model.addAttribute("communities", communityPage.getContent());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", communityPage.getTotalPages());
+            model.addAttribute("search", search);
+            model.addAttribute("category", category);
+
+            // 페이지네이션을 위한 추가 속성
+            int totalPages = communityPage.getTotalPages();
+            int start = Math.max(0, page - 2);
+            int end = Math.min(totalPages - 1, page + 2);
+            if (end - start < 4 && totalPages > 5) {
+                if (start == 0) {
+                    end = Math.min(4, totalPages - 1);
+                } else if (end == totalPages - 1) {
+                    start = Math.max(0, totalPages - 5);
+                }
+            }
+            model.addAttribute("startPage", start);
+            model.addAttribute("endPage", end);
+
+            return "community";
         }
 
-        model.addAttribute("communities", communityPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", communityPage.getTotalPages());
-        model.addAttribute("search", search);
-        model.addAttribute("category", category);
-        return "community";
-    }
+    
 
     @GetMapping("/write")
     public String showWriteForm(Model model, Principal principal) {
@@ -61,7 +80,7 @@ public class CommunityController {
         if (principal == null) {
             return "redirect:/login?redirect=/community/" + id;
         }
-        Community community = communityService.getCommunityById(id);
+        Community community = communityService.getCommunityByIdAndIncrementViewCount(id);
         model.addAttribute("community", community);
         if (principal != null) {
             model.addAttribute("currentUserEmail", principal.getName());
@@ -100,5 +119,4 @@ public class CommunityController {
         communityService.updateCommunity(id, updatedCommunity);
         return "redirect:/community/" + id;
     }
-
 }

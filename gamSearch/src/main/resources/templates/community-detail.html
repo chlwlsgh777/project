@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>게시글 상세</title>
-    <link rel="stylesheet" th:href="@{/css/community.css}">
+    <link rel="stylesheet" th:href="@{/css/community-detail.css}">
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
 </head>
@@ -13,19 +13,32 @@
     <div th:replace="~{nav :: global-nav}"></div>
 
     <div class="community-layout">
-        <h2 th:text="${community.title}">게시글 제목</h2>
-        <p>작성자: <span th:text="${community.author.nickname}"></span></p>
-        <p>작성일: <span th:text="${#temporals.format(community.date, 'yyyy-MM-dd HH:mm')}"></span></p>
-        <p>카테고리: <span th:text="${community.category}"></span></p>
-        <div th:text="${community.description}">게시글 내용</div>
+        <div class="community-detail">
+            <h2 class="community-detail-title" th:text="${community.title}">게시글 제목</h2>
+            <br>
+            <div class="community-detail-info">
+                <span class="category" th:text="${community.category}">카테고리</span>
+                <span class="author" th:text="'작성자: ' + ${community.author.nickname}">작성자: 홍길동</span>
+                <span class="date"
+                    th:text="'작성날짜: '+ ${#temporals.format(community.date, 'yyyy-MM-dd HH:mm')}">2024-11-05 12:00</span>
+                <span class="view-count" th:text="'조회수: ' + ${community.viewCount}">조회수: 0</span>
+            </div>
+            <br>
+            <div class="community-detail-content"
+                th:utext="${#strings.replace(#strings.escapeXml(community.description), '&#10;', '<br>')}"></div>
+        </div>
 
-        <!-- 수정 및 삭제 버튼 (작성자에게만 표시) -->
+
+
+    </div>
+
+    <div class="community-detail-actions">
+        <button onclick="goToList()" class="btn-list">목록으로</button>
         <div th:if="${#authentication.principal.username == community.author.email}">
             <button onclick="editPost()" class="btn-edit">수정</button>
             <button onclick="deletePost()" class="btn-delete">삭제</button>
         </div>
 
-        <a th:href="@{/community(category=${community.category})}" class="btn-list">목록으로</a>
     </div>
 
     <script th:inline="javascript">
@@ -47,7 +60,7 @@
                     .then(function (response) {
                         if (response.ok) {
                             alert('게시글이 삭제되었습니다.');
-                            window.location.href = /*[[@{/community}]]*/ '/community';
+                            goToList();
                         } else {
                             alert('게시글 삭제에 실패했습니다.');
                         }
@@ -56,6 +69,20 @@
                         console.error('Error:', error);
                         alert('오류가 발생했습니다.');
                     });
+            }
+        }
+
+        function goToList() {
+            var returnUrl = sessionStorage.getItem('communityReturnUrl');
+            if (returnUrl) {
+                window.location.href = returnUrl;
+                sessionStorage.removeItem('communityReturnUrl');
+            } else {
+                if (document.referrer.indexOf(window.location.host) !== -1) {
+                    history.back();
+                } else {
+                    window.location.href = '/community';
+                }
             }
         }
         /*]]>*/
