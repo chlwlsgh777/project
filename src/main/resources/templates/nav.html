@@ -1,0 +1,22 @@
+<nav th:fragment="global-nav" class="global-nav">
+    <div class="nav-auth">
+        <div sec:authorize="isAuthenticated()">
+            <span th:text="${session.userName} + '님 환영합니다'">사용자님 환영합니다</span>
+            <div style="display:flex; margin-top:5px;">
+                <button onclick="location.href='/mypage'" class="nav-button" style="flex:1; margin-right:5px;">마이페이지</button>
+                <form th:action="@{/logout}" method="post" style="flex:1; margin:0;">
+                    <button type="submit" class="nav-button">로그아웃</button>
+                </form>
+            </div>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <a href="/login">로그인</a> 
+            <a href="/register">회원가입</a>
+        </div>
+    </div>
+    
+    <a href="/">홈</a>
+    <a href="/chatbot">겜색기</a>
+    <a href="/community">커뮤니티</a>
+    <a href="/discount">할인목록</a>
+</nav>
