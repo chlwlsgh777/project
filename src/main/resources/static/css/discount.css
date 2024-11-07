@@ -1,0 +1,73 @@
+    body {
+        font-family: 'Noto Sans KR', sans-serif;
+        margin: 0;
+        color: #f4f4f4;
+    }
+
+    h1 {
+        color: white;
+        text-align: center;
+    }
+
+    table {
+        width: 80%;
+        margin: 0 auto;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #333;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #00b8c8;
+        color: black;
+    }
+
+    tr {
+        transition: background-color 0.3s ease;
+    }
+
+    tr:hover {
+        background-color: #444;
+    }
+
+    td {
+        color: #f4f4f4;
+    }
+
+    .discount {
+        color: #e53935;
+        font-weight: bold;
+    }
+
+    #loading {
+        text-align: center;
+        margin-top: 20px;
+        color: #00b8c8;
+        font-weight: bold;
+    }
+
+    .game-image {
+        width: 120px;
+        height: 45px;
+        object-fit: cover;
+        vertical-align: middle;
+        margin-right: 10px;
+    }
+
+    .game-name-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .game-name-container a {
+        color: white; /* 글자 색상을 흰색으로 설정 */
+        text-decoration: none; /* 링크의 밑줄 제거 */
+    }
+    
