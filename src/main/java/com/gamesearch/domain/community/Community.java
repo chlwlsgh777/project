@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.gamesearch.domain.user.User;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +26,8 @@ public class Community {
     private Long id;
     private String category;
     private String title;
+
+    @Column(columnDefinition = "TEXT") // 본문을 TEXT 타입으로 설정
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)

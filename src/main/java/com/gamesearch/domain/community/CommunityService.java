@@ -1,18 +1,16 @@
 package com.gamesearch.domain.community;
 
-import java.util.List;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
 import com.gamesearch.domain.user.User;
 import com.gamesearch.domain.user.UserService;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,73 +18,81 @@ public class CommunityService {
 
     private final CommunityRepository communityRepository;
     private final UserService userService;
+    private final CommentService commentService;
 
-    public List<Community> getAllCommunities() {
-        return communityRepository.findAll();
+    
+    public Page<CommunityDto> getAllCommunities(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<Community> communityPage = communityRepository.findAll(pageable);
+        return communityPage.map(CommunityMapper::toDto);
     }
 
     @Transactional
-    public void addCommunity(Community community, String userEmail) {
+    public CommunityDto createCommunity(CommunityDto communityDto, String userEmail) {
         User currentUser = userService.findByEmail(userEmail);
+        Community community = new Community();
+        community.setTitle(communityDto.getTitle());
+        community.setDescription(communityDto.getDescription());
+        community.setCategory(communityDto.getCategory());
         community.setAuthor(currentUser);
-        communityRepository.save(community);
+        community.setViewCount(0);
+        Community savedCommunity = communityRepository.save(community);
+        return CommunityMapper.toDto(savedCommunity);
     }
 
-    public List<Community> searchCommunities(String searchText) {
-        return communityRepository.findByTitleContainingIgnoreCase(searchText);
+    public Page<CommunityDto> searchCommunities(String category, String searchText, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<Community> communityPage;
+        if ("전체".equals(category)) {
+            communityPage = communityRepository.findByTitleContainingIgnoreCase(searchText, pageable);
+        } else {
+            communityPage = communityRepository.findByCategoryAndTitleContainingIgnoreCase(category, searchText,
+                    pageable);
+        }
+        return communityPage.map(CommunityMapper::toDto);
     }
 
-    public Community getCommunityById(Long id) {
-        return communityRepository.findById(id)
+    public CommunityDto getCommunityById(Long id) {
+        Community community = communityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        return CommunityMapper.toDto(community);
     }
 
+    
     @Transactional
-    public Community getCommunityByIdAndIncrementViewCount(Long id) {
+    public CommunityDto getCommunityByIdAndIncrementViewCount(Long id) {
         Community community = communityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         community.setViewCount(community.getViewCount() + 1);
-        return communityRepository.save(community);
+        communityRepository.save(community);
+        return CommunityMapper.toDto(community);
     }
 
-    public Page<Community> getAllCommunities(int page, int size) {
+    public Page<CommunityDto> getCommunityByCategory(String category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        return communityRepository.findAll(pageable);
-    }
-
-    public Page<Community> getCommunityByCategory(String category, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        return communityRepository.findByCategory(category, pageable);
-    }
-
-    public Page<Community> searchCommunities(String searchText, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        return communityRepository.findByTitleContainingIgnoreCase(searchText, pageable);
-    }
-
-    public Page<Community> searchCommunities(String category, String searchText, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        if ("전체".equals(category)) {
-            return communityRepository.findByTitleContainingIgnoreCase(searchText, pageable);
-        } else {
-            return communityRepository.findByCategoryAndTitleContainingIgnoreCase(category, searchText, pageable);
-        }
+        Page<Community> communityPage = communityRepository.findByCategory(category, pageable);
+        return communityPage.map(CommunityMapper::toDto);
     }
 
     @Transactional
-    public void updateCommunity(Long id, Community updatedCommunity) {
-        Community community = communityRepository.findById(id)
+    public void updateCommunity(CommunityDto updatedCommunityDto) {
+        Community community = communityRepository.findById(updatedCommunityDto.getId())
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
-        // 수정 가능한 필드들만 업데이트
-        community.setTitle(updatedCommunity.getTitle());
-        community.setDescription(updatedCommunity.getDescription());
-        community.setCategory(updatedCommunity.getCategory());
+        community.setTitle(updatedCommunityDto.getTitle());
+        community.setDescription(updatedCommunityDto.getDescription());
+        community.setCategory(updatedCommunityDto.getCategory());
 
-        // 변경된 엔티티는 자동으로 데이터베이스에 반영됩니다 (더티 체킹)
+        communityRepository.save(community);
     }
 
+    @Transactional
     public void deleteCommunity(Long id) {
+        List<Comment> comments = commentService.getCommentEntitiesByCommunityId(id);
+        for (Comment comment : comments) {
+            commentService.deleteComment(comment.getId());
+        }
+
         communityRepository.deleteById(id);
     }
 
