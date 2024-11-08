@@ -6,10 +6,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gamesearch.domain.coupon.Coupon;
+import com.gamesearch.domain.coupon.CouponService;
+
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.List;
 
 @Service
@@ -17,9 +21,32 @@ public class SteamService {
     private static final Logger logger = LoggerFactory.getLogger(SteamService.class);
     private static final String STEAM_DISCOUNT_URL = "https://store.steampowered.com/search/?specials=1&supportedlang=koreana&ndl=1";
 
+    @Autowired
+    private CouponService couponService;
+
     public List<Discount> getDiscountedGames(int page, int size) {
+        List<Discount> games = fetchDiscountedGames(page, size);
+        
+        for (Discount game : games) {
+            // 해당 게임에 대한 유효한 쿠폰 가져오기
+            List<Coupon> validCoupons = couponService.getValidCouponsForGame(game.getSteamUrl()); // Steam URL을 게임 ID로 사용
+            
+            for (Coupon coupon : validCoupons) {
+                double newPrice = couponService.applyCoupon(game, coupon.getCode());
+                if (newPrice < game.getFinalPrice()) {
+                    game.setFinalPrice(newPrice);
+                    game.setCoupon(coupon);
+                    break; // 가장 좋은 쿠폰 하나만 적용
+                }
+            }
+        }
+        
+        return games;
+    }
+
+    private List<Discount> fetchDiscountedGames(int page, int size) {
         List<Discount> games = new ArrayList<>();
-        String url = STEAM_DISCOUNT_URL + "&page=" + (page + 1); // Steam uses 1-based indexing
+        String url = STEAM_DISCOUNT_URL + "&page=" + (page + 1);
 
         try {
             Document doc = Jsoup.connect(url).get();
@@ -51,19 +78,9 @@ public class SteamService {
         double discountedPriceValue = parseDoubleSafely(discountedPrice);
 
         String imageUrl = game.select("img").attr("src");
-        String steamUrl = game.attr("href");
+        String steamUrl = game.attr("href"); // Steam URL을 사용하여 게임 ID로 사용
 
-        logger.debug("Game: {}, Discount: {}%, Original: {}, Discounted: {}", 
-            name, discountPercentValue, originalPriceValue, discountedPriceValue);
-
-        return new Discount(
-            name,
-            discountPercentValue,
-            originalPriceValue,
-            discountedPriceValue,
-            imageUrl,
-            steamUrl
-        );
+        return new Discount(name, discountPercentValue, originalPriceValue, discountedPriceValue, imageUrl, steamUrl);
     }
 
     private int parseIntSafely(String value) {

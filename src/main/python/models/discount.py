@@ -68,7 +68,7 @@ def discount_page():
 @discount_bp.route('/api/games', methods=['GET'])
 def get_more_games():
     try:
-        page = int(request.args.get('page', 0))
+        page = int(request.args.get('page', 1))
         size = int(request.args.get('size', DEFAULT_PAGE_SIZE))
         games, has_more = get_discounted_games(page, size)
         return jsonify({
