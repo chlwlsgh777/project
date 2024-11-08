@@ -7,6 +7,111 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/discount.css}">
+    <style>
+        /* 기본 스타일 */
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: rgb(25, 32, 48);
+            color: white;
+            margin: 0;
+            padding-left: 220px;
+            /* 네비게이션 바 너비 + 여백 */
+        }
+
+        /* 쿠폰 스타일 */
+        .coupon {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #ffcc00;
+            color: #000;
+            border-radius: 5px;
+            font-size: 0.8em;
+            margin-left: 10px;
+            position: relative;
+        }
+
+        .coupon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -5px;
+            width: 10px;
+            height: 100%;
+            background: radial-gradient(circle at 0 50%, transparent 5px, #ffcc00 5px);
+        }
+
+        .coupon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -5px;
+            width: 10px;
+            height: 100%;
+            background: radial-gradient(circle at 100% 50%, transparent 5px, #ffcc00 5px);
+        }
+
+        /* 더 보기 버튼 스타일 */
+        #loadMoreBtn {
+            display: block;
+            margin: 20px auto;
+            background-color: #00b8c8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #loadMoreBtn:hover {
+            background-color: #008c99;
+        }
+
+        /* 쿠폰 발급 버튼 스타일 */
+        .issue-coupon-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,13 +124,14 @@
                 <th>할인율</th>
                 <th>원가</th>
                 <th>할인가</th>
+                <th>할인 쿠폰</th>
             </tr>
         </thead>
         <tbody id="gamesList">
             <tr th:each="game : ${games}">
                 <td>
                     <div class="game-name-container">
-                        <a th:href="${game.steamUrl}" target="_blank"> <!-- 링크 추가 -->
+                        <a th:href="${game.steamUrl}" target="_blank">
                             <img th:src="${game.imageUrl}" alt="게임 이미지" class="game-image">
                             <span th:text="${game.name}"></span>
                         </a>
@@ -34,20 +140,40 @@
                 <td class="discount" th:text="${game.discountPercent + '%'}"></td>
                 <td th:text="${'￦' + #numbers.formatDecimal(game.originalPrice, 0, 'COMMA', 0, 'POINT')}"></td>
                 <td th:text="${'￦' + #numbers.formatDecimal(game.finalPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                <td>
+                    <span th:if="${game.coupon != null}" class="coupon" th:text="${game.coupon.code}"></span>
+                    <button th:if="${game.coupon == null}" class="issue-coupon-btn" th:attr="data-game-id=${game.steamUrl}" onclick="openCouponModal(this)">쿠폰 발급</button>
+                </td>
             </tr>
         </tbody>
     </table>
+
+    <!-- 로딩 메시지 -->
     <div id="loading" style="display:none;">
         <div class="spinner"></div>
         <p>게임을 더 불러오는 중...</p>
     </div>
+
+    <!-- 더 보기 버튼 -->
     <button id="loadMoreBtn" th:if="${hasMore}">더 보기</button>
 
+    <!-- 쿠폰 발급 모달 -->
+    <div id="couponModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>쿠폰 발급</h2>
+            <p>이 게임에 대한 쿠폰을 발급하시겠습니까?</p>
+            <button id="issueCouponBtn">발급하기</button>
+        </div>
+    </div>
+
+    <!-- JavaScript 부분 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:inline="javascript">
-        let page = 0;
+        let page = 1;
         const size = 10;
         let hasMore = /*[[${hasMore}]]*/ false;
+        let currentGameId;
 
         $(document).ready(function () {
             if (hasMore) {
@@ -75,12 +201,12 @@
                         }
                     } else {
                         $('#loadMoreBtn').hide();
-                        $('#gamesList').append('<tr><td colspan="4">더 이상 표시할 게임이 없습니다.</td></tr>');
+                        $('#gamesList').append('<tr><td colspan="5">더 이상 표시할 게임이 없습니다.</td></tr>');
                     }
                 },
                 error: function (xhr, status, error) {
                     console.error("AJAX 오류:", status, error);
-                    $('#gamesList').append('<tr><td colspan="4">게임 로딩 중 오류가 발생했습니다. 페이지를 새로고침하거나 나중에 다시 시도해 주세요.</td></tr>');
+                    $('#gamesList').append('<tr><td colspan="5">게임 로딩 중 오류가 발생했습니다. 페이지를 새로고침하거나 나중에 다시 시도해 주세요.</td></tr>');
                 },
                 complete: function () {
                     $('#loading').hide();
@@ -96,7 +222,7 @@
                 row.innerHTML = `
                     <td>
                         <div class="game-name-container">
-                            <a href="${game.steamUrl}" target="_blank"> <!-- 링크 추가 -->
+                            <a href="${game.steamUrl}" target="_blank">
                                 <img src="${game.imageUrl}" alt="${game.name} 게임 이미지" class="game-image" loading="lazy">
                                 <span>${game.name}</span>
                             </a>
@@ -105,9 +231,55 @@
                     <td class="discount">${game.discountPercent}%</td>
                     <td>￦${Math.floor(game.originalPrice).toLocaleString()}</td>
                     <td>￦${Math.floor(game.finalPrice).toLocaleString()}</td>
+                    <td>
+                        ${game.coupon 
+                            ? `<span class="coupon">${game.coupon.code}</span>`
+                            : `<button class="issue-coupon-btn" data-game-id="${game.steamUrl}" onclick="openCouponModal(this)">쿠폰 발급</button>`
+                        }
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        function openCouponModal(button) {
+            currentGameId = button.getAttribute('data-game-id');
+            document.getElementById('couponModal').style.display = 'block';
+        }
+
+        // 모달 닫기
+        document.getElementsByClassName('close')[0].onclick = function() {
+            document.getElementById('couponModal').style.display = 'none';
+        }
+
+        // 쿠폰 발급 버튼 클릭 이벤트
+        document.getElementById('issueCouponBtn').onclick = function() {
+            issueCoupon(currentGameId);
+        }
+
+        function issueCoupon(gameId) {
+            $.ajax({
+                url: '/api/coupons/issue',
+                method: 'POST',
+                data: { gameId: gameId },
+                success: function(response) {
+                    alert('쿠폰이 발급되었습니다: ' + response.code);
+                    document.getElementById('couponModal').style.display = 'none';
+                    // 페이지 새로고침 또는 해당 게임의 쿠폰 정보 업데이트
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('쿠폰 발급 중 오류가 발생했습니다.');
+                    console.error("쿠폰 발급 오류:", status, error);
+                }
+            });
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('couponModal')) {
+                document.getElementById('couponModal').style.display = "none";
+            }
         }
     </script>
 </body>
