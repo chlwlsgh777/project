@@ -36,7 +36,7 @@ public class UserService {
 
         return user;
     }
-    
+
     public boolean isEmailAvailable(String email) {
         return !userRepository.existsByEmail(email);
     }
@@ -48,6 +48,11 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
+    public String getNicknameByEmail(String email) {
+        User user = findByEmail(email); // 이메일로 사용자 조회
+        return user.getNickname(); // 닉네임 반환
     }
 
     @Transactional
@@ -66,7 +71,8 @@ public class UserService {
 
     public User findByEmailOrNickname(String emailOrNickname) {
         return userRepository.findByEmailOrNickname(emailOrNickname, emailOrNickname)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email or nickname: " + emailOrNickname));
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "User not found with email or nickname: " + emailOrNickname));
     }
 
     public User getCurrentUser(String email) {
