@@ -24,7 +24,7 @@
                 <span class="view-count" th:text="'조회수: ' + ${communityDto.viewCount}"></span>
             </div>
             <div class="community-detail-content"
-                th:utext="${#strings.replace(#strings.escapeXml(communityDto.description), '&#10;', '<br>')}"></div>
+                th:utext="${#strings.replace(#strings.escapeXml(communityDto.description), '\n', '<br>')}"></div>
         </div>
 
         <!-- 게시글 수정/삭제/목록 이동 버튼 -->

@@ -37,6 +37,11 @@ public class CommunityController {
             communityPage = communityService.getAllCommunities(page, size);
         }
 
+        // 유효한 페이지 범위 내에 있는지 확인
+        if (page > 0 && page >= communityPage.getTotalPages()) {
+            return "redirect:/community?page=0"; // 유효하지 않은 페이지 요청 시 0페이지로 리다이렉트
+        }
+
         model.addAttribute("communities", communityPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", communityPage.getTotalPages());

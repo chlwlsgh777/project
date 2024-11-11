@@ -188,12 +188,19 @@ body {
     border-radius: 8px;
     color: white;
     transition: background-color 0.3s ease;
-    position: absolute;
-    right: 0;
+    display: inline-block;
+    /* 버튼처럼 보이게 설정 */
 }
 
 .add-post-btn:hover {
     background-color: rgba(0, 184, 200, 0.7);
+}
+
+.add-post-btn-container {
+    margin-top: 20px;
+    /* 버튼 위에 여백 추가 */
+    text-align: right;
+    /* 버튼을 오른쪽으로 정렬 */
 }
 
 .community-search-bar {
