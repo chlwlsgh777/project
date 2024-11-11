@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
@@ -46,19 +45,21 @@ public class CommunityController {
 
         // 페이지 네비게이션을 위한 시작 및 종료 페이지 설정
         int totalPages = communityPage.getTotalPages();
-        int start = Math.max(0, page - 2);
-        int end = Math.min(totalPages - 1, page + 2);
-
-        if (end - start < 4 && totalPages > 5) {
-            if (start == 0) {
-                end = Math.min(4, totalPages - 1);
-            } else if (end == totalPages - 1) {
-                start = Math.max(0, totalPages - 5);
-            }
-        }
+        int pageGroup = (int) Math.floor(page / 5);
+        int start = pageGroup * 5;
+        int end = Math.min((pageGroup + 1) * 5 - 1, totalPages - 1);
 
         model.addAttribute("startPage", start);
         model.addAttribute("endPage", end);
+
+        // 이전 그룹과 다음 그룹의 존재 여부 확인
+        boolean hasPreviousGroup = pageGroup > 0;
+        boolean hasNextGroup = (pageGroup + 1) * 5 < totalPages;
+
+        model.addAttribute("hasPreviousGroup", hasPreviousGroup);
+        model.addAttribute("hasNextGroup", hasNextGroup);
+        model.addAttribute("previousGroupPage", Math.max(0, start - 5));
+        model.addAttribute("nextGroupPage", Math.min(totalPages - 1, end + 1));
 
         return "community";
     }
@@ -126,8 +127,6 @@ public class CommunityController {
 
         return "redirect:/community/" + id; // 수정 후 게시글 상세 페이지로 리다이렉트
     }
-
-    
 
     @GetMapping("/write")
     public String showWriteForm(Model model, Principal principal) {
