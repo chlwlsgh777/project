@@ -50,7 +50,8 @@
 						<td th:text="${community.category}"></td>
 						<td>
 							<a th:href="@{/community/{id}(id=${community.id})}" th:text="${community.title}"
-								th:onclick="'sessionStorage.setItem(\'communityReturnUrl\', window.location.href);'"></a>
+								onclick="sessionStorage.setItem('communityReturnUrl', window.location.href)">
+							</a>
 						</td>
 						<td th:text="${community.authorName}"></td>
 						<td th:text="${#temporals.format(community.date, 'MM-dd')}"></td>
