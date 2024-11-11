@@ -45,6 +45,9 @@
 					</tr>
 				</thead>
 				<tbody>
+					<tr th:if="${#lists.isEmpty(communities)}">
+						<td colspan="6" style="text-align: center;">게시글이 없습니다.</td>
+					</tr>	
 					<tr th:each="community : ${communities}">
 						<td th:text="${community.id}"></td>
 						<td th:text="${community.category}"></td>
@@ -60,8 +63,13 @@
 				</tbody>
 			</table>
 
+
+			<div class="add-post-btn-container">
+				<span class="add-post-btn" onclick="checkLoginBeforeWrite()">글쓰기</span>
+			</div>
+			
 			<div class="community-footer">
-				<div class="pagination-container">
+				<div class="pagination-container" th:if="${totalPages > 1}">
 					<div class="pagination-box">
 						<a href="javascript:void(0);" onclick="goToPage(0)" class="pagination-button">처음</a>
 						<a href="javascript:void(0);" th:onclick="'goToPage(' + ${currentPage - 1} + ')'"
@@ -75,7 +83,7 @@
 						<a href="javascript:void(0);" th:onclick="'goToPage(' + ${totalPages - 1} + ')'"
 							class="pagination-button">마지막</a>
 					</div>
-					<span class="add-post-btn" onclick="checkLoginBeforeWrite()">글쓰기</span>
+					
 				</div>
 
 				<!-- 검색 폼 -->
