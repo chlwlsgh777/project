@@ -104,7 +104,9 @@
             }
 
             function goToList() {
-                window.location.href = '/community';
+                // 저장된 URL이 있다면 해당 URL로 이동, 없으면 기본 커뮤니티 페이지로 이동
+                const returnUrl = sessionStorage.getItem("communityReturnUrl") || "/community";
+                window.location.href = returnUrl;
             }
 
             function limitEmptyLines(text, maxEmptyLines = 3) {
