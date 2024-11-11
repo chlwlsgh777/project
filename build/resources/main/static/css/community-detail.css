@@ -108,7 +108,7 @@ body {
 
 .comment p {
     font-size: 14px;
-    line-height: 1.3;
+    line-height: 1.4;
     margin-bottom: 5px;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -263,6 +263,19 @@ body {
 .edit-form .btn-save:hover,
 .edit-form .btn-cancel:hover {
     text-decoration: underline;
+}
+
+.btn-toggle {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9em;
+}
+
+.comment-content {
+    transition: max-height 0.3s ease-out;
 }
 
 @media (max-width: 768px) {

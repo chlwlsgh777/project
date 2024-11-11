@@ -47,6 +47,7 @@
                     <small
                         th:text="${comment.authorName + '(' + #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm') + ')'}"></small>
                     <p class="comment-content" th:text="${comment.content}"></p>
+                    <button class="btn-toggle" style="display: none;">펼치기</button>
                     <div th:if="${currentUsername != null and comment.authorEmail != null and currentUsername == comment.authorEmail}"
                         class="comment-actions">
                         <button class="btn-commentedit" th:onclick="'editComment(' + ${comment.id} + ')'">수정</button>
@@ -72,14 +73,12 @@
             </form>
         </div>
 
-
         <script th:inline="javascript">
             /*<![CDATA[*/
             const communityId = /*[[${communityDto.id}]]*/ 0;
             const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-            // 게시글 수정/삭제/목록 이동 버튼 기능
             function editPost() {
                 window.location.href = `/community/edit/${communityId}`;
             }
@@ -108,14 +107,34 @@
                 window.location.href = '/community';
             }
 
-            // 댓글 폼 제출 처리 (AJAX)
+            function limitEmptyLines(text, maxEmptyLines = 3) {
+                const lines = text.split('\n');
+                const result = [];
+                let emptyLineCount = 0;
+
+                for (const line of lines) {
+                    if (line.trim() === '') {
+                        emptyLineCount++;
+                        if (emptyLineCount <= maxEmptyLines) {
+                            result.push(line);
+                        }
+                    } else {
+                        result.push(line);
+                        emptyLineCount = 0;
+                    }
+                }
+
+                return result.join('\n');
+            }
+
             document.addEventListener('DOMContentLoaded', function () {
                 const form = document.getElementById('commentForm');
                 const textarea = document.getElementById('commentContent');
                 const charCount = document.getElementById('charCount');
 
                 textarea.addEventListener('input', function () {
-                    charCount.textContent = `${textarea.value.length} / 300`;
+                    this.value = limitEmptyLines(this.value);
+                    charCount.textContent = `${this.value.length} / 300`;
                 });
 
                 form.addEventListener('submit', function (event) {
@@ -148,47 +167,82 @@
                             alert('댓글 작성에 실패했습니다: ' + error.message);
                         });
                 });
+
+                initializeComments();
             });
 
-            // 댓글을 페이지에 추가하는 함수
+            function initializeComments() {
+                document.querySelectorAll('.comment').forEach(comment => {
+                    const content = comment.querySelector('.comment-content');
+                    const toggleBtn = comment.querySelector('.btn-toggle');
+
+                    if (content.scrollHeight > 80) {
+                        content.style.maxHeight = '80px';
+                        content.style.overflow = 'hidden';
+                        toggleBtn.style.display = 'inline-block';
+
+                        toggleBtn.onclick = function () {
+                            toggleComment(content, this);
+                        };
+                    } else {
+                        toggleBtn.style.display = 'none';
+                    }
+
+                    const editTextarea = comment.querySelector('.edit-textarea');
+                    const editCharCount = comment.querySelector('.edit-char-count');
+                    if (editTextarea && editCharCount) {
+                        editTextarea.addEventListener('input', function () {
+                            this.value = limitEmptyLines(this.value);
+                            updateCharCount(this, editCharCount);
+                        });
+                    }
+                });
+            }
+
+            function toggleComment(content, button) {
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    content.style.overflow = 'visible';
+                    button.textContent = '접기';
+                } else {
+                    content.style.maxHeight = '80px';
+                    content.style.overflow = 'hidden';
+                    button.textContent = '펼치기';
+                }
+            }
+
             function addCommentToPage(comment) {
                 const commentsContainer = document.getElementById('commentsContainer');
                 const newCommentDiv = document.createElement('div');
                 newCommentDiv.classList.add('comment');
                 newCommentDiv.setAttribute('data-id', comment.id);
 
-                // currentUsername과 댓글 작성자(authorEmail)가 일치할 경우 수정/삭제 버튼 활성화
                 const isAuthor = (comment.authorEmail === /*[[${currentUsername}]]*/ "");
 
                 newCommentDiv.innerHTML = `
-        <small>${comment.authorName} (${new Date(comment.createdAt).toLocaleString()})</small>
-        <p class="comment-content">${comment.content}</p>
-        ${isAuthor ? `
-            <div class="comment-actions">
-                <button class="btn-commentedit" onclick="editComment(${comment.id})">수정</button>
-                <button class="btn-commentdelete" onclick="deleteComment(${comment.id})">삭제</button>
-            </div>
-        ` : ''}
-        <div class="edit-form" style="display: none;">
-            <textarea class="edit-textarea" maxlength="300"></textarea>
-            <span class="edit-char-count">0 / 300</span>
-            <div class="btn-container">
-                <button class="btn-save">저장</button>
-                <button class="btn-cancel">취소</button>
-            </div>
-        </div>
-    `;
-
-
+                    <small>${comment.authorName} (${new Date(comment.createdAt).toLocaleString()})</small>
+                    <p class="comment-content">${comment.content}</p>
+                    <button class="btn-toggle" style="display: none;">펼치기</button>
+                    ${isAuthor ? `
+                        <div class="comment-actions">
+                            <button class="btn-commentedit" onclick="editComment(${comment.id})">수정</button>
+                            <button class="btn-commentdelete" onclick="deleteComment(${comment.id})">삭제</button>
+                        </div>
+                    ` : ''}
+                    <div class="edit-form" style="display: none;">
+                        <textarea class="edit-textarea" maxlength="300"></textarea>
+                        <span class="edit-char-count">0 / 300</span>
+                        <div class="btn-container">
+                            <button class="btn-save">저장</button>
+                            <button class="btn-cancel">취소</button>
+                        </div>
+                    </div>
+                `;
                 commentsContainer.appendChild(newCommentDiv);
 
-                // 글자 수 카운트 기능 추가
-                const textarea = newCommentDiv.querySelector('.edit-textarea');
-                const charCount = newCommentDiv.querySelector('.edit-char-count');
-                textarea.addEventListener('input', function () {
-                    updateCharCount(this, charCount);
-                });
+                initializeComments();
             }
+
             function updateCharCount(textarea, charCountElement) {
                 const maxLength = textarea.getAttribute('maxlength');
                 const currentLength = textarea.value.length;
@@ -201,16 +255,15 @@
                 const editForm = commentDiv.querySelector('.edit-form');
                 const textarea = editForm.querySelector('.edit-textarea');
                 const actionButtons = commentDiv.querySelector('.comment-actions');
+                const toggleBtn = commentDiv.querySelector('.btn-toggle');
 
-                // 현재 내용을 텍스트 영역에 설정
                 textarea.value = contentP.textContent;
 
-                // 내용과 수정/삭제 버튼을 숨기고 편집 폼을 표시
                 contentP.style.display = 'none';
                 actionButtons.style.display = 'none';
+                toggleBtn.style.display = 'none';
                 editForm.style.display = 'block';
 
-                // 저장 버튼 이벤트 리스너
                 editForm.querySelector('.btn-save').onclick = function () {
                     const newContent = textarea.value.trim();
                     if (newContent) {
@@ -218,11 +271,11 @@
                     }
                 };
 
-                // 취소 버튼 이벤트 리스너
                 editForm.querySelector('.btn-cancel').onclick = function () {
                     contentP.style.display = 'block';
                     actionButtons.style.display = 'block';
                     editForm.style.display = 'none';
+                    initializeComments();
                 };
             }
 
@@ -241,10 +294,28 @@
                     })
                     .then(updatedComment => {
                         const commentDiv = document.querySelector(`.comment[data-id="${commentId}"]`);
-                        commentDiv.querySelector('.comment-content').textContent = updatedComment.content;
-                        commentDiv.querySelector('.comment-content').style.display = 'block';
+                        const contentP = commentDiv.querySelector('.comment-content');
+                        const toggleBtn = commentDiv.querySelector('.btn-toggle');
+
+                        contentP.textContent = updatedComment.content;
+                        contentP.style.display = 'block';
                         commentDiv.querySelector('.comment-actions').style.display = 'block';
                         commentDiv.querySelector('.edit-form').style.display = 'none';
+
+                        contentP.style.maxHeight = null;
+                        contentP.style.overflow = null;
+                        toggleBtn.style.display = 'none';
+                        toggleBtn.textContent = '펼치기';
+
+                        if (contentP.scrollHeight > 80) {
+                            contentP.style.maxHeight = '80px';
+                            contentP.style.overflow = 'hidden';
+                            toggleBtn.style.display = 'inline-block';
+
+                            toggleBtn.onclick = function () {
+                                toggleComment(contentP, this);
+                            };
+                        }
                     })
                     .catch(error => {
                         console.error('Error:', error);

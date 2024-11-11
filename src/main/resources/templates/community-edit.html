@@ -31,13 +31,20 @@
                 </div>
                 <div>
                     <label for="description">내용 :</label>
-                    <textarea id="description" th:field="*{description}" required maxlength="4000" oninput="updateCharacterCount()"></textarea>
-                    <span id="charCount">0 / 4000자</span> <!-- 문자 수 표시 -->
+                    <textarea id="description" th:field="*{description}" required maxlength="4000"
+                        oninput="updateCharacterCount()"></textarea>
+                    <div class="char-count-container">
+                        <div id="charCount">0 / 4000자</div>
+                    </div> <!-- 문자 수 표시 -->
                 </div>
                 <div>
-                    <button type="submit">수정하기</button>
-                    <button type="button"
-                        th:onclick="'window.location.href=\'' + @{/community/{id}(id=${communityDto.id})} + '\''">취소</button>
+                    <div class="community-edit-actions">
+                        <button type="submit" class="btn-submit">수정하기</button>
+                        <button type="button" class="btn-cancel"
+                            th:onclick="'window.location.href=\'' + @{/community/{id}(id=${communityDto.id})} + '\''">취소</button>
+
+                    </div>
+
                 </div>
             </form>
         </div>
