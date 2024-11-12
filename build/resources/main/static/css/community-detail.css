@@ -53,18 +53,34 @@ body {
     margin-bottom: 20px;
     padding: 0 15px;
     font-family: Arial, sans-serif;
-    word-wrap: break-word; /* 단어가 박스를 넘을 경우 자동 줄바꿈 */
-    word-break: break-word; /* 긴 단어나 URL이 박스를 넘을 경우 줄바꿈 */
-    overflow-wrap: break-word; /* 모든 브라우저에서 동일한 동작을 보장 */
-    white-space: pre-wrap; /* 줄바꿈 및 공백 유지 */
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
 }
-
 
 .community-detail-actions {
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 20px;
+}
+
+.left-spacer {
+    flex: 1;
+}
+
+.btn-list {
+    flex: 1;
+    text-align: center;
+}
+
+.edit-delete-container {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-right: 5px;
 }
 
 .btn-edit,
@@ -90,6 +106,7 @@ body {
 
 .btn-list {
     background-color: #00b8c8;
+    max-width: 100px;
 }
 
 .btn-edit:hover,
@@ -110,6 +127,7 @@ body {
     border-radius: 4px;
     padding: 15px;
     margin-bottom: 15px;
+    position: relative;
 }
 
 .comment p {
@@ -172,9 +190,8 @@ body {
 
 .comment-content {
     overflow: hidden;
-    /* 넘치는 부분은 숨김 */
     position: relative;
-    /* 더보기 버튼 위치를 위한 설정 */
+    transition: max-height 0.3s ease-out;
 }
 
 .more-button {
@@ -184,12 +201,6 @@ body {
     cursor: pointer;
     display: block;
     margin-top: 5px;
-}
-
-
-.comment {
-    position: relative;
-    /* 수정/삭제 버튼 위치 지정을 위해 */
 }
 
 .comment-actions {
@@ -211,7 +222,6 @@ body {
 
 .btn-commentdelete {
     color: #f44336;
-
 }
 
 .btn-commentedit:hover,
@@ -240,7 +250,7 @@ body {
 .edit-form .edit-char-count {
     position: absolute;
     right: 10px;
-    bottom: 35px; /* 버튼 위에 위치하도록 조정 */
+    bottom: 35px;
     font-size: 12px;
     color: #888;
     margin-right: 5px;
@@ -261,10 +271,10 @@ body {
     font-size: 12px;
     padding: 5px 10px;
 }
+
 .edit-form .btn-cancel {
     color: #f44336;
 }
-
 
 .edit-form .btn-save:hover,
 .edit-form .btn-cancel:hover {
@@ -278,10 +288,6 @@ body {
     cursor: pointer;
     padding: 0;
     font-size: 0.9em;
-}
-
-.comment-content {
-    transition: max-height 0.3s ease-out;
 }
 
 @media (max-width: 768px) {
