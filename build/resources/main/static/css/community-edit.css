@@ -18,7 +18,7 @@ body {
 .community-detail {
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    padding: 40px;
+    padding: 30px;
     margin-top: 20px;
     width: 100%;
     max-width: 1200px;
@@ -48,18 +48,16 @@ body {
 .community-detail input,
 .community-detail select,
 .community-detail textarea {
-
+    width: 98%;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.05);
     color: #ffffff;
     font-size: 16px;
+    font-family: Arial, sans-serif; /* 동일한 폰트 설정 */
 }
 
-.community-detail input {
-    width: 98%;
-}
 
 .community-detail select {
     width: 10%;
@@ -82,8 +80,8 @@ body {
 
 .community-detail textarea {
     height: 400px;
-    width: 98%;
     resize: vertical;
+    line-height: 1.6;
 }
 
 .community-edit-actions {

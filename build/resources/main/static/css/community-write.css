@@ -18,7 +18,7 @@ body {
 .community-detail {
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    padding: 40px;
+    padding: 30px;
     margin-top: 20px;
     width: 100%;
     max-width: 1200px;
@@ -48,16 +48,16 @@ body {
 .community-detail input,
 .community-detail select,
 .community-detail textarea {
+    width: 98%;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.05);
     color: #ffffff;
     font-size: 16px;
-}
-
-.community-detail input {
-    width: 98%;
+    /* 동일한 글씨 크기 설정 */
+    font-family: Arial, sans-serif;
+    /* 동일한 폰트 설정 */
 }
 
 .community-detail select {
@@ -79,15 +79,14 @@ body {
 }
 
 .community-detail textarea {
-    height: 400px;
-    width: 98%;
+    height: 400px;  
     resize: vertical;
+    line-height: 1.6;
 }
 
 .community-detail-actions {
     display: flex;
     justify-content: flex-end;
-    /* 오른쪽 정렬로 변경 */
     margin-top: 30px;
 }
 
@@ -104,7 +103,6 @@ body {
     border: none;
     transition: background-color 0.3s ease;
     margin-left: 20px;
-    /* 버튼 사이의 간격 추가 */
 }
 
 .btn-submit {

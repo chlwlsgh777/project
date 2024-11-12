@@ -4,108 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: rgb(25, 32, 48);
-            color: #ffffff;
-            margin: 0;
-            padding-left: 220px;
-            min-height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .registration-container {
-            background-color: #3c3c3c;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            width: 320px;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .input-container {
-            position: relative;
-            width: 100%;
-        }
-
-        .input-container input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: #555;
-            color: #fff;
-            box-sizing: border-box;
-        }
-
-        .input-container button {
-            position: absolute;
-            top: 0px;
-            bottom: 0px;
-            right: 0px;
-            padding: 0 10px;
-            border-radius: 5px;
-            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-
-        .input-container button:hover {
-            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
-        }
-
-        .submit-button {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
-            color: #fff;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .submit-button:hover {
-            background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
-        }
-
-        .check-result {
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding-left: 0;
-            }
-
-            .registration-container {
-                width: 90%;
-                padding: 20px;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/register.css}">
+    
+
 </head>
 <body>
     <div th:replace="~{nav :: global-nav}"></div>

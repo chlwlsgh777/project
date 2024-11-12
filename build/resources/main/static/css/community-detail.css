@@ -11,7 +11,7 @@ body {
 
 .community-layout {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1306px;
     padding: 20px;
     box-sizing: border-box;
 }
@@ -52,7 +52,13 @@ body {
     line-height: 1.6;
     margin-bottom: 20px;
     padding: 0 15px;
+    font-family: Arial, sans-serif;
+    word-wrap: break-word; /* 단어가 박스를 넘을 경우 자동 줄바꿈 */
+    word-break: break-word; /* 긴 단어나 URL이 박스를 넘을 경우 줄바꿈 */
+    overflow-wrap: break-word; /* 모든 브라우저에서 동일한 동작을 보장 */
+    white-space: pre-wrap; /* 줄바꿈 및 공백 유지 */
 }
+
 
 .community-detail-actions {
     display: flex;
