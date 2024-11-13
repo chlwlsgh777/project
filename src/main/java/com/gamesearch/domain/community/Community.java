@@ -39,5 +39,5 @@ public class Community {
 
     private int viewCount = 0;
 
-    // getters and setters
+    private int commentCount = 0;
 }

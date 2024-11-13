@@ -141,7 +141,7 @@ label {
 
 
 .detailBox {
-    width: 80%;
+    width: 75%;
     padding: 20px;
 }
 
@@ -155,8 +155,8 @@ label {
 .postlist th {
     padding: 5px;
     text-align: center;
-    border-bottom: 1px solid rgb(209, 211, 212);
-    border-top: 1px solid rgb(209, 211, 212);
+    border-bottom: 3px solid rgb(209, 211, 212);
+    border-top: 3px solid rgb(209, 211, 212);
 }
 .postlist td {
     padding: 10px;

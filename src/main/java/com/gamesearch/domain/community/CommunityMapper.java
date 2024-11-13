@@ -18,6 +18,7 @@ public class CommunityMapper {
         
         dto.setDate(community.getDate());
         dto.setViewCount(community.getViewCount());
+        dto.setCommentCount(community.getCommentCount());
         
         // // 댓글 수 설정 (댓글 리스트가 필요함)
         // if (community.getComments() != null) {

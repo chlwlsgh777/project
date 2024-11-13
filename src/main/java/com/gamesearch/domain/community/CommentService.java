@@ -38,6 +38,10 @@ public class CommentService {
         comment.setAuthor(user);
 
         Comment savedComment = commentRepository.save(comment);
+
+        community.setCommentCount(community.getCommentCount() + 1);
+        communityRepository.save(community);
+       
         CommentDto commentDto = CommentMapper.toDto(savedComment);
         commentDto.setAuthorName(user.getNickname());
         return commentDto;
@@ -56,7 +60,11 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = getCommentEntityById(commentId);
+        Community community = comment.getCommunity();
         commentRepository.delete(comment);
+
+        community.setCommentCount(community.getCommentCount() - 1);
+        communityRepository.save(community);
     }
 
     // 특정 댓글 ID로 댓글 가져오기 (DTO 반환)

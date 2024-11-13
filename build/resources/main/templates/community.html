@@ -53,7 +53,7 @@
 						<td th:text="${community.id}"></td>
 						<td th:text="${community.category}"></td>
 						<td>
-							<a th:href="@{/community/{id}(id=${community.id})}" th:text="${community.title}"
+							<a th:href="@{/community/{id}(id=${community.id})}" th:text="${community.title} + ' &nbsp;&nbsp;[' + ${community.commentCount} + ']'"
 								onclick="sessionStorage.setItem('communityReturnUrl', window.location.href)">
 							</a>
 						</td>
@@ -63,6 +63,7 @@
 					</tr>
 				</tbody>
 			</table>
+
 
 
 			<div class="add-post-btn-container">
