@@ -21,7 +21,7 @@
     <div class="main-content">
 
         <div class="box">
-            <div class="user-info">
+            <div class="userinfoBox">
                 <h2>사용자 정보</h2>
                 <p class="hello">안녕하세요, <span th:text="${user.name}"></span>님!</p>
                 <div class="info-Container">
@@ -43,13 +43,43 @@
                                 <input type="text" id="newNickname" name="newNickname" required
                                     placeholder="새 닉네임을 입력하세요" maxlength="12">
                                 <button type="button" id="checkNickname">중복 확인</button>
-                                <button type="submit" id="updateNickname" disabled = "false">변경</button>
+                                <button type="submit" id="updateNickname" disabled="false">변경</button>
                             </form>
                         </div>
                     </div>
 
                 </div>
             </div>
+
+            <div class="detailBox">
+                <div class="postlist">
+                    <h3>작성한 게시글</h3>
+                    <table class="postlist-header">
+                        <thead>
+                            <tr>
+                                <th>카테고리</th>
+                                <th>제목</th>
+                                <th>작성일자</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(userPosts)}">
+                                <td colspan="3" style="text-align: center;">작성한 게시글이 없습니다.</td>
+                            </tr>
+                            <tr th:each="post : ${userPosts}">
+                                <td th:text="${post.category}" class="categoryText"></td>
+                                <td>
+                                    <a th:href="@{/community/{id}(id=${post.id})}" th:text="${post.title}" class="titleText"
+                                        onclick="sessionStorage.setItem('communityReturnUrl', '/mypage')">
+                                    </a>
+                                </td>
+                                <td th:text="${#temporals.format(post.date, 'yyyy-MM-dd')}" class="dateText"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
     </div>

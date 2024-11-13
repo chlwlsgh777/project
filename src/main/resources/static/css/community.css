@@ -116,27 +116,27 @@ body {
 
 .community-e-header th:nth-child(2),
 .community-e-header td:nth-child(2) {
-    width: 15%;
+    width: 8%;
 }
 
 .community-e-header th:nth-child(3),
 .community-e-header td:nth-child(3) {
-    width: 50%;
+    width: 55%;
 }
 
 .community-e-header th:nth-child(4),
 .community-e-header td:nth-child(4) {
-    width: 10%;
+    width: 15%;
 }
 
 .community-e-header th:nth-child(5),
 .community-e-header td:nth-child(5) {
-    width: 10%;
+    width: 7%;
 }
 
 .community-e-header th:nth-child(6),
 .community-e-header td:nth-child(6) {
-    width: 15%;
+    width: 4%;
 }
 
 .community-footer {

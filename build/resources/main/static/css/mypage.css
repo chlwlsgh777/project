@@ -18,6 +18,11 @@ h2 {
 }
 
 
+.userinfoBox {
+    padding: 20px;
+    border-bottom: 1px solid rgb(209, 211, 212);
+}
+
 #header {
     text-align: center;
     margin-bottom: 20px;
@@ -119,6 +124,65 @@ label {
     padding: 10px;
 
 }
+.postlist-header th:nth-child(1),
+.postlist-header td:nth-child(1) {
+    width: 10%;
+}
+
+.postlist-header th:nth-child(2),
+.postlist-header td:nth-child(2) {
+    width: 70%;
+}
+
+.postlist-header th:nth-child(3),
+.postlist-header td:nth-child(3) {
+    width: 15%;
+}
+
+
+.detailBox {
+    width: 80%;
+    padding: 20px;
+}
+
+
+.postlist table {
+    width: 100%;
+    border-collapse: collapse;
+    
+}
+
+.postlist th {
+    padding: 5px;
+    text-align: center;
+    border-bottom: 1px solid rgb(209, 211, 212);
+    border-top: 1px solid rgb(209, 211, 212);
+}
+.postlist td {
+    padding: 10px;
+    border-bottom: 1px solid rgb(209, 211, 212);
+}
+
+.categoryText,
+.dateText {
+    text-align: center;
+}
+
+.titleText {
+    text-overflow: ellipsis;
+}
+
+
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    color: #00b8c8;
+}
+
 
 @media (max-width: 768px) {
     body {

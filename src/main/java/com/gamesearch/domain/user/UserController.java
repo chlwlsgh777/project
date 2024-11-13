@@ -1,6 +1,7 @@
 package com.gamesearch.domain.user;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,6 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import com.gamesearch.domain.community.Community;
+import com.gamesearch.domain.community.CommunityService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,7 @@ import java.security.Principal;
 public class UserController {
 
     private final UserService userService;
+    private final CommunityService communityService;
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
@@ -72,12 +77,16 @@ public class UserController {
     }
 
     @GetMapping("/mypage")
-    public String showMyPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+    public String myPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return "redirect:/login";
         }
-        User user = userService.findByEmail(userDetails.getUsername());
+        String userEmail = userDetails.getUsername();
+        User user = userService.findByEmail(userEmail);
+        List<Community> userPosts = communityService.findByAuthor(user);
+
         model.addAttribute("user", user);
+        model.addAttribute("userPosts", userPosts);
         return "mypage";
     }
 
