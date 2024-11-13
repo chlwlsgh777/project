@@ -20,14 +20,14 @@
             <div class="input-group">
                 <label for="name">이름:</label>
                 <div class="input-container">
-                    <input type="text" id="name" th:field="*{name}" required placeholder="이름을 입력하세요">
+                    <input type="text" id="name" th:field="*{name}" required placeholder="이름을 입력하세요" maxlength="10">
                 </div>
             </div>
 
             <div class="input-group">
                 <label for="email">이메일:</label>
                 <div class="input-container">
-                    <input type="email" id="email" th:field="*{email}" required placeholder="이메일을 입력하세요">
+                    <input type="email" id="email" th:field="*{email}" required placeholder="이메일을 입력하세요" maxlength="30">
                     <button id="btnCheckEmail" type="button">중복확인</button>
                 </div>
                 <span id="checkResult" class="check-result"></span>
@@ -36,7 +36,7 @@
             <div class="input-group">
                 <label for="nickname">닉네임:</label>
                 <div class="input-container">
-                    <input type="text" id="newNickname" th:field="*{nickname}" required placeholder="닉네임을 입력하세요">
+                    <input type="text" id="newNickname" th:field="*{nickname}" required placeholder="닉네임을 입력하세요 (최대 12글자)" maxlength="12">
                     <button id="checkNickname" type="button">중복확인</button>
                 </div>
                 <span id="nicknameCheckResult" class="check-result"></span>
@@ -104,6 +104,7 @@
                     } else {
                         $nicknameCheckResult.textContent = '중복된 닉네임입니다.';
                         $nicknameCheckResult.style.color = 'red';
+                        $newNickname.value = "";
                     }
                 })
                 .catch(error => {

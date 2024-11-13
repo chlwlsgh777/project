@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
+
 </head>
+
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
     <div id="header">
@@ -16,81 +19,102 @@
     </div>
 
     <div class="main-content">
-        
+
         <div class="box">
             <div class="user-info">
                 <h2>사용자 정보</h2>
-                <p>안녕하세요, <span th:text="${user.name}"></span>님!</p>
-                <p>이메일: <span th:text="${user.email}"></span></p>
-                <p>현재 닉네임: <span th:text="${user.nickname}"></span></p>
+                <p class="hello">안녕하세요, <span th:text="${user.name}"></span>님!</p>
+                <div class="info-Container">
+                    <div class="idInfo">
+                        <div>
+                            <label for="email">아이디 : </label>
+                            <span th:text="${user.email}" class="emailText"></span>
+                        </div>
+                    </div>
+                    <div class="nicknameInfo">
+                        <div>
+                            <label for="currentNickname" class="currentNickname">현재 닉네임 : </label>
+                            <span th:text="${user.nickname}" class="nicknameText"></span>
+                        </div>
+                        <button id="changeNicknameBtn">변경하기</button>
+                        <div id="nicknameChangeForm">
+                            <form id="nicknameForm" th:action="@{/update-nickname}" method="post">
+                                <label for="newNickname">새 닉네임:</label>
+                                <input type="text" id="newNickname" name="newNickname" required
+                                    placeholder="새 닉네임을 입력하세요" maxlength="12">
+                                <button type="button" id="checkNickname">중복 확인</button>
+                                <button type="submit" id="updateNickname" disabled = "false">변경</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-    
-            <p>닉네임 변경
-            <form id="nicknameForm" th:action="@{/update-nickname}" method="post">
-                <label for="newNickname">새 닉네임:</label>
-                <input type="text" id="newNickname" name="newNickname" required placeholder="새 닉네임을 입력하세요">
-                <button type="button" id="checkNickname">중복 확인</button>
-                <span id="nicknameCheckResult"></span>
-                <button type="submit" id="updateNickname" disabled>변경</button>
-            </form>
-            </p>
         </div>
 
-
-         <!-- 성공 메시지 표시 -->
-         <div th:if="${success}" class="success-message" th:text="${success}"></div>
-
-         <!-- 에러 메시지 표시 -->
-         <div th:if="${error}" class="error-message" th:text="${error}"></div>
     </div>
 
     <script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        const checkNicknameButton = document.getElementById('checkNickname');
-        const newNicknameInput = document.getElementById('newNickname');
-        const nicknameCheckResult = document.getElementById('nicknameCheckResult');
-        const updateNicknameButton = document.getElementById('updateNickname');
+        document.addEventListener('DOMContentLoaded', function () {
+            const changeNicknameBtn = document.getElementById('changeNicknameBtn');
+            const nicknameChangeForm = document.getElementById('nicknameChangeForm');
+            const checkNicknameButton = document.getElementById('checkNickname');
+            const newNicknameInput = document.getElementById('newNickname');
+            const updateNicknameButton = document.getElementById('updateNickname');
 
-        checkNicknameButton.addEventListener('click', function() {
-            const newNickname = newNicknameInput.value;
-            if (newNickname) {
-                fetch('/check-nickname', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ nickname: newNickname })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.available) {
-                        nicknameCheckResult.textContent = '사용 가능한 닉네임입니다.';
-                        nicknameCheckResult.style.color = 'green';
-                        updateNicknameButton.disabled = false;
-                    } else {
-                        nicknameCheckResult.textContent = '이미 사용 중인 닉네임입니다.';
-                        nicknameCheckResult.style.color = 'red';
-                        updateNicknameButton.disabled = true;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    nicknameCheckResult.textContent = '중복 확인 중 오류가 발생했습니다.';
-                    nicknameCheckResult.style.color = 'red';
+
+            changeNicknameBtn.addEventListener('click', function () {
+                nicknameChangeForm.style.display = 'block';
+                changeNicknameBtn.style.display = 'none';
+            });
+
+
+            // 닉네임 변경 인풋 박스에 입력값이 12가 넘어가면 자동으로 잘라주는 함수
+            newNicknameInput.addEventListener('input', function () {
+                if (newNicknameInput.value.length > 12) {
+                    newNicknameInput.value = newNicknameInput.value.slice(0, 12);
+                }
+            });
+
+            checkNicknameButton.addEventListener('click', function () {
+                const newNickname = newNicknameInput.value;
+                if (newNickname) {
+                    fetch('/check-nickname', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ nickname: newNickname })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.available) {
+                                alert("사용가능한 닉네임 입니다. 변경하시려면 변경 버튼을 눌러주세요.")
+                                updateNicknameButton.disabled = false;
+                            } else {
+                                alert("이미 사용중인 닉네임 입니다.")
+                                newNicknameInput.value = "";
+                                updateNicknameButton.disabled = true;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("중복 확인 중 오류가 발생했습니다.")
+                            updateNicknameButton.disabled = true;
+                        });
+                } else {
+                    alert("닉네임을 입력해주세요")
                     updateNicknameButton.disabled = true;
-                });
-            } else {
-                nicknameCheckResult.textContent = '닉네임을 입력해주세요.';
-                nicknameCheckResult.style.color = 'red';
-                updateNicknameButton.disabled = true;
-            }
-        });
+                }
+            });
 
-        newNicknameInput.addEventListener('input', function() {
-            updateNicknameButton.disabled = true;
-            nicknameCheckResult.textContent = '';
+            updateNicknameButton.addEventListener('click', function () {
+                if (updateNicknameButton.disabled === false) {
+                    alert("닉네임 변경 완료")
+                }
+            });
         });
-    });
     </script>
 </body>
+
 </html>
