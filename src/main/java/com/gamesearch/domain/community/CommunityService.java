@@ -21,7 +21,6 @@ public class CommunityService {
     private final UserService userService;
     private final CommentService commentService;
 
-    
     public Page<CommunityDto> getAllCommunities(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Community> communityPage = communityRepository.findAll(pageable);
@@ -41,14 +40,34 @@ public class CommunityService {
         return CommunityMapper.toDto(savedCommunity);
     }
 
-    public Page<CommunityDto> searchCommunities(String category, String searchText, int page, int size) {
+    public Page<CommunityDto> searchCommunities(String category, String searchOption, String searchText, int page,
+            int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Community> communityPage;
-        if ("전체".equals(category)) {
-            communityPage = communityRepository.findByTitleContainingIgnoreCase(searchText, pageable);
-        } else {
-            communityPage = communityRepository.findByCategoryAndTitleContainingIgnoreCase(category, searchText,
-                    pageable);
+
+        switch (searchOption) {
+            case "제목":
+                communityPage = "전체".equals(category)
+                        ? communityRepository.findByTitleContainingIgnoreCase(searchText, pageable)
+                        : communityRepository.findByCategoryAndTitleContainingIgnoreCase(category, searchText,
+                                pageable);
+                break;
+            case "내용":
+                communityPage = "전체".equals(category)
+                        ? communityRepository.findByDescriptionContainingIgnoreCase(searchText, pageable)
+                        : communityRepository.findByCategoryAndDescriptionContainingIgnoreCase(category, searchText,
+                                pageable);
+                break;
+            case "작성자":
+                communityPage = "전체".equals(category)
+                        ? communityRepository.findByAuthor_NicknameContainingIgnoreCase(searchText, pageable)
+                        : communityRepository.findByCategoryAndAuthor_NicknameContainingIgnoreCase(category, searchText,
+                                pageable);
+                break;
+            default:
+                // 전체 검색 (제목, 내용, 작성자 모두 포함)
+                communityPage = communityRepository.searchAllFields(category, searchText, pageable);
+                break;
         }
         return communityPage.map(CommunityMapper::toDto);
     }
@@ -59,7 +78,6 @@ public class CommunityService {
         return CommunityMapper.toDto(community);
     }
 
-    
     @Transactional
     public CommunityDto getCommunityByIdAndIncrementViewCount(Long id) {
         Community community = communityRepository.findById(id)
@@ -102,6 +120,4 @@ public class CommunityService {
         return communityRepository.findByAuthor(author);
     }
 
-
-    
 }

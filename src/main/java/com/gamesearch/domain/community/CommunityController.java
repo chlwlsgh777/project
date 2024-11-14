@@ -24,28 +24,25 @@ public class CommunityController {
     public String communityPage(Model model,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "전체") String category) {
+            @RequestParam(defaultValue = "전체") String category,
+            @RequestParam(defaultValue = "제목") String searchOption) {
         int size = 5;
         Page<CommunityDto> communityPage;
 
-        // 검색 또는 카테고리에 따라 커뮤니티 목록을 가져옵니다.
         if (search != null && !search.isEmpty()) {
-            communityPage = communityService.searchCommunities(category, search, page, size);
+            communityPage = communityService.searchCommunities(category, searchOption, search, page, size);
         } else if (!category.equals("전체")) {
             communityPage = communityService.getCommunityByCategory(category, page, size);
         } else {
             communityPage = communityService.getAllCommunities(page, size);
         }
 
-        // 유효한 페이지 범위 내에 있는지 확인
-        if (page > 0 && page >= communityPage.getTotalPages()) {
-            return "redirect:/community?page=0"; // 유효하지 않은 페이지 요청 시 0페이지로 리다이렉트
-        }
-
         model.addAttribute("communities", communityPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", communityPage.getTotalPages());
         model.addAttribute("search", search);
+        model.addAttribute("category", category);
+        model.addAttribute("searchOption", searchOption);
         model.addAttribute("category", category);
 
         // 페이지 네비게이션을 위한 시작 및 종료 페이지 설정
