@@ -1,39 +1,61 @@
 package com.gamesearch.domain.coupon;
 
-import org.springframework.stereotype.Service;
-
 import com.gamesearch.domain.discount.Discount;
+import com.gamesearch.domain.game.Game;
+import com.gamesearch.domain.game.GameRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CouponService {
-    private List<Coupon> coupons = new ArrayList<>();
 
-    // 특정 게임에 대한 쿠폰 생성
-    public Coupon createCoupon(String code, float discountPercent, LocalDate expirationDate, String gameId) {
-        Coupon newCoupon = new Coupon(code, discountPercent, expirationDate, gameId);
-        coupons.add(newCoupon);
-        return newCoupon;
+    @Autowired
+    private CouponRepository couponRepository;
+
+    @Autowired
+    private GameRepository gameRepository;
+
+    @Transactional
+    public Coupon createCoupon(String code, float discountPercent, LocalDate expirationDate, Long gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new RuntimeException("Game not found"));
+
+        // 쿠폰 생성 및 필드 설정
+        Coupon coupon = new Coupon();
+        coupon.setCode(code);
+        coupon.setDiscountPercent(discountPercent);
+        coupon.setExpirationDate(expirationDate);
+        coupon.setGame(game); // 게임 설정
+
+        return couponRepository.save(coupon);
     }
 
-    // 특정 게임에 대한 유효한 쿠폰 조회
-    public List<Coupon> getValidCouponsForGame(String gameId) {
-        LocalDate currentDate = LocalDate.now();
-        return coupons.stream()
-                .filter(coupon -> coupon.getExpirationDate().isAfter(currentDate) && coupon.getGameId().equals(gameId))
-                .collect(Collectors.toList());
+    public List<Coupon> getAllCoupons() {
+        return couponRepository.findAll();
     }
 
-    // 쿠폰 적용
+    public long getCouponCount() {
+        return couponRepository.count();
+    }
+
+    public List<Coupon> getValidCouponsForGame(Long gameId) {
+        LocalDate now = LocalDate.now();
+        return couponRepository.findByGame_IdAndExpirationDateAfter(gameId, now);
+    }
+
+    // applyCoupon 메서드 추가
     public double applyCoupon(Discount discount, String couponCode) {
-        return coupons.stream()
-                .filter(coupon -> coupon.getCode().equals(couponCode))
-                .findFirst()
-                .map(coupon -> discount.getFinalPrice() * (1 - coupon.getDiscountPercent() / 100))
-                .orElse(discount.getFinalPrice());
+        // 쿠폰 코드로 쿠폰을 찾기
+        Coupon coupon = couponRepository.findByCode(couponCode)
+                .orElseThrow(() -> new RuntimeException("Invalid coupon code"));
+
+        // 할인 적용 로직 (예: 최종 가격 계산)
+        double finalPrice = discount.getFinalPrice() * (1 - (coupon.getDiscountPercent() / 100));
+        
+        return finalPrice; // 최종 가격 반환
     }
 }

@@ -1,10 +1,11 @@
 package com.gamesearch.domain.user;
 
+import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import com.gamesearch.domain.community.Community;
 import com.gamesearch.domain.community.CommunityService;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-
-import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,38 +32,18 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") User user, Model model) {
+    public ResponseEntity<?> registerUser(@ModelAttribute("user") User user) {
+        Map<String, Object> response = new HashMap<>();
         try {
             userService.registerUser(user);
-            model.addAttribute("success", "회원가입이 완료되었습니다. 로그인해주세요.");
-            return "redirect:/login?registered";
-        } catch (DataIntegrityViolationException e) {
-            model.addAttribute("error", "이미 존재하는 이메일 또는 닉네임입니다.");
-            return "register";
-        } catch (Exception e) {
-            model.addAttribute("error", "회원가입 중 오류가 발생했습니다: " + e.getMessage());
-            return "register";
+            response.put("success", true);
+            response.put("message", "회원가입이 완료되었습니다. 로그인해주세요.");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
-    }
-
-    @PostMapping("/check-email")
-    @ResponseBody
-    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestBody Map<String, String> payload) {
-        String email = payload.get("email");
-        boolean isAvailable = userService.isEmailAvailable(email);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("available", isAvailable);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/check-nickname")
-    @ResponseBody
-    public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestBody Map<String, String> payload) {
-        String nickname = payload.get("nickname");
-        boolean isAvailable = userService.isNicknameAvailable(nickname);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("available", isAvailable);
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/login")
@@ -87,6 +65,7 @@ public class UserController {
 
         model.addAttribute("user", user);
         model.addAttribute("userPosts", userPosts);
+        model.addAttribute("isAdmin", userService.isAdmin(user.getEmail()));
         return "mypage";
     }
 
@@ -104,9 +83,8 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/index?logout";
+    public String logout() {
+        return "redirect:/login?logout";
     }
 
     @GetMapping("/api/check-login")
@@ -115,5 +93,33 @@ public class UserController {
         Map<String, Boolean> response = new HashMap<>();
         response.put("isLoggedIn", principal != null);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/check-email")
+    @ResponseBody
+    public Map<String, Object> checkEmail(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        Map<String, Object> response = new HashMap<>();
+
+        if (!userService.isValidEmail(email)) {
+            response.put("available", false);
+            response.put("message", "유효하지 않은 이메일 형식입니다.");
+        } else if (userService.isEmailAvailable(email)) {
+            response.put("available", true);
+            response.put("message", "사용 가능한 이메일입니다.");
+        } else {
+            response.put("available", false);
+            response.put("message", "이미 사용 중인 이메일입니다.");
+        }
+
+        return response;
+    }
+
+    @PostMapping("/check-nickname")
+    @ResponseBody
+    public Map<String, Boolean> checkNickname(@RequestBody Map<String, String> payload) {
+        String nickname = payload.get("nickname");
+        boolean isAvailable = userService.isNicknameAvailable(nickname);
+        return Collections.singletonMap("available", isAvailable);
     }
 }

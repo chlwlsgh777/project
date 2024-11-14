@@ -3,6 +3,7 @@ package com.gamesearch.domain.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,12 +14,13 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.gamesearch.domain.user.CustomUserDetailsService;
+import com.gamesearch.domain.user.CustomUserDetails;
 
 import jakarta.servlet.http.HttpSession;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig implements WebMvcConfigurer {
 
     @Bean
@@ -39,6 +41,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 "/discount", "/community/**", "/api/games") // API 요청 허용
                         .permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 페이지 접근 제한
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -65,8 +68,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return (request, response, authentication) -> {
             HttpSession session = request.getSession();
-            if (authentication.getPrincipal() instanceof CustomUserDetailsService.CustomUserDetails userDetails) {
+            if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
                 session.setAttribute("userName", userDetails.getName());
+                session.setAttribute("userRole", userDetails.getAuthorities().toString());
             }
 
             String redirectUrl = request.getParameter("redirect");
