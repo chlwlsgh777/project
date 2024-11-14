@@ -19,10 +19,10 @@
             <h2 class="community-detail-title" th:text="${communityDto.title}">게시글 제목</h2>
             <div class="community-detail-info">
                 <span class="category" th:text="${communityDto.category}">카테고리</span>
-                <span class="author" th:text="'작성자: ' + ${communityDto.authorName}">작성자: 홍길동</span>
+                <span class="author" th:text="'작성자 : ' + ${communityDto.authorName}">작성자: 홍길동</span>
                 <span class="date"
-                    th:text="'작성날짜: '+ ${#temporals.format(communityDto.date, 'yyyy-MM-dd HH:mm')}"></span>
-                <span class="view-count" th:text="'조회수: ' + ${communityDto.viewCount}"></span>
+                    th:text="'작성날짜 : '+ ${#temporals.format(communityDto.date, 'yyyy-MM-dd &nbsp; HH:mm')}"></span>
+                <span class="view-count" th:text="'조회수 : ' + ${communityDto.viewCount}"></span>
             </div>
             <div class="community-detail-content"
                 th:utext="${#strings.replace(#strings.escapeXml(communityDto.description), '\n', '<br>')}"></div>
@@ -50,8 +50,10 @@
             <h3>댓글 [<span th:text="${communityDto.commentCount}" id="commentCount"></span>]</h3>
             <div id="commentsContainer">
                 <div th:each="comment : ${comments}" class="comment" th:attr="data-id=${comment.id}">
-                    <small
-                        th:text="${comment.authorName + '(' + #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm') + ')'}"></small>
+                    <div class="commenthead">
+                        <small
+                            th:text="${comment.authorName + '&nbsp;(' + #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm') + ')'}"></small>
+                    </div>
                     <p class="comment-content" th:text="${comment.content}"></p>
                     <button class="btn-toggle" style="display: none;">펼치기</button>
                     <div th:if="${currentUsername != null and comment.authorEmail != null and currentUsername == comment.authorEmail}"
@@ -228,7 +230,9 @@
                 const isAuthor = (comment.authorEmail === /*[[${currentUsername}]]*/ "");
 
                 newCommentDiv.innerHTML = `
+                    <div class="commenthead">
                     <small>${comment.authorName} (${new Date(comment.createdAt).toLocaleString()})</small>
+                    </div>
                     <p class="comment-content">${comment.content}</p>
                     <button class="btn-toggle" style="display: none;">펼치기</button>
                     ${isAuthor ? `
