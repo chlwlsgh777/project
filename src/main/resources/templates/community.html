@@ -48,12 +48,13 @@
 				<tbody>
 					<tr th:if="${#lists.isEmpty(communities)}">
 						<td colspan="6" style="text-align: center;">게시글이 없습니다.</td>
-					</tr>	
+					</tr>
 					<tr th:each="community : ${communities}">
 						<td th:text="${community.id}"></td>
 						<td th:text="${community.category}"></td>
 						<td>
-							<a th:href="@{/community/{id}(id=${community.id})}" th:text="${community.title} + ' &nbsp;&nbsp;[' + ${community.commentCount} + ']'"
+							<a th:href="@{/community/{id}(id=${community.id})}"
+								th:text="${community.title} + ' &nbsp;&nbsp;[' + ${community.commentCount} + ']'"
 								onclick="sessionStorage.setItem('communityReturnUrl', window.location.href)">
 							</a>
 						</td>
@@ -69,7 +70,7 @@
 			<div class="add-post-btn-container">
 				<span class="add-post-btn" onclick="checkLoginBeforeWrite()">글쓰기</span>
 			</div>
-			
+
 			<div class="community-footer">
 				<div class="pagination-container" th:if="${totalPages > 1}">
 					<div class="pagination-box">
@@ -85,19 +86,17 @@
 						<a href="javascript:void(0);" th:onclick="'goToPage(' + ${totalPages - 1} + ')'"
 							class="pagination-button">마지막</a>
 					</div>
-					
+
 				</div>
 
 				<!-- 검색 폼 -->
 				<form class="community-search-bar" th:action="@{/community}" method="get">
-					
-					<select id="search-option">
-                        <option value="">전체</option>
-                        <option value="">제목</option>
-                        <option value="">내용</option>
-                        <option value="">작성자</option>
-                    </select>
-					
+					<select id="search-option" name="searchOption">
+						<option value="전체">전체</option>
+						<option value="제목">제목</option>
+						<option value="내용">내용</option>
+						<option value="작성자">작성자</option>
+					</select>
 					<input type="text" name="search" th:value="${search}" placeholder="게시글 검색"
 						class="community-search-input" aria-label="게시글 검색" />
 					<input type="hidden" name="page" value="0" />
