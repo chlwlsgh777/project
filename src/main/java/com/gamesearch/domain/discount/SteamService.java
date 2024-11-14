@@ -13,7 +13,7 @@ import com.gamesearch.domain.coupon.Coupon;
 import com.gamesearch.domain.coupon.CouponService;
 
 import java.io.IOException;
-import java.util.ArrayList; 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,21 +26,21 @@ public class SteamService {
 
     public List<Discount> getDiscountedGames(int page, int size) {
         List<Discount> games = fetchDiscountedGames(page, size);
-        
+
         for (Discount game : games) {
-            // 해당 게임에 대한 유효한 쿠폰 가져오기
-            List<Coupon> validCoupons = couponService.getValidCouponsForGame(game.getSteamUrl()); // Steam URL을 게임 ID로 사용
-            
+            Long gameId = extractGameIdFromSteamUrl(game.getSteamUrl());
+            List<Coupon> validCoupons = couponService.getValidCouponsForGame(gameId);
+
             for (Coupon coupon : validCoupons) {
                 double newPrice = couponService.applyCoupon(game, coupon.getCode());
                 if (newPrice < game.getFinalPrice()) {
                     game.setFinalPrice(newPrice);
-                    game.setCoupon(coupon);
+                    game.addCoupon(coupon); // 수정된 부분: addCoupon 메서드 사용
                     break; // 가장 좋은 쿠폰 하나만 적용
                 }
             }
         }
-        
+
         return games;
     }
 
@@ -55,7 +55,7 @@ public class SteamService {
             for (Element game : gameElements) {
                 games.add(parseGameElement(game));
                 if (games.size() >= size) {
-                    break;
+                    break; // 원하는 수의 게임을 가져오면 종료
                 }
             }
 
@@ -78,9 +78,22 @@ public class SteamService {
         double discountedPriceValue = parseDoubleSafely(discountedPrice);
 
         String imageUrl = game.select("img").attr("src");
-        String steamUrl = game.attr("href"); // Steam URL을 사용하여 게임 ID로 사용
+        String steamUrl = game.attr("href");
 
         return new Discount(name, discountPercentValue, originalPriceValue, discountedPriceValue, imageUrl, steamUrl);
+    }
+
+    private Long extractGameIdFromSteamUrl(String steamUrl) {
+        // Steam URL에서 게임 ID 추출
+        String[] parts = steamUrl.split("/");
+        if (parts.length > 4) { // URL에서 게임 ID 추출
+            try {
+                return Long.parseLong(parts[4]); // 4번째 요소가 게임 ID임
+            } catch (NumberFormatException e) {
+                logger.warn("Failed to extract game ID from URL: {}", steamUrl);
+            }
+        }
+        return null; // 유효하지 않은 경우 null 반환
     }
 
     private int parseIntSafely(String value) {

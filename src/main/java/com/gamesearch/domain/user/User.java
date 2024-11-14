@@ -1,27 +1,14 @@
 package com.gamesearch.domain.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@Table(name="USERS")
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Table(name = "USERS")
 public class User {
 
     @Id
@@ -29,22 +16,27 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String name;
 
-    @Column(nullable=false, unique = true, length=30)
+    @Column(nullable = false, unique = true, length = 30)
     private String email;
 
-    @Column(nullable=false)
-    @JsonIgnore
+    @Column(nullable = false)
     private String password;
 
-    @Column(nullable=false, unique = true, length=12)
+    @Column(nullable = false, unique = true, length = 12)
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-    
-    //email과 password로 로그인
-    
+    public enum Role {
+        USER, ADMIN
+    }
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
+    }
 }
-

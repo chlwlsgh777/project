@@ -22,14 +22,14 @@ public class CouponController {
     public ResponseEntity<Coupon> createCoupon(@RequestParam String code,
                                                @RequestParam float discountPercent,
                                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationDate,
-                                               @RequestParam String gameId) { // 게임 ID 추가
+                                               @RequestParam Long gameId) { // 게임 ID 추가
         Coupon newCoupon = couponService.createCoupon(code, discountPercent, expirationDate, gameId);
         return ResponseEntity.ok(newCoupon);
     }
 
     // 유효한 쿠폰 조회 API
     @GetMapping("/valid")
-    public ResponseEntity<List<Coupon>> getValidCoupons(@RequestParam String gameId) { // 게임 ID로 필터링
+    public ResponseEntity<List<Coupon>> getValidCoupons(@RequestParam Long gameId) { // 게임 ID로 필터링
         List<Coupon> validCoupons = couponService.getValidCouponsForGame(gameId);
         return ResponseEntity.ok(validCoupons);
     }

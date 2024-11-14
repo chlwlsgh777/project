@@ -8,12 +8,11 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/discount.css}">
-      
 </head>
 
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
-    <h1>Steam 할인 게임 목록</h1>
+    <h1>할인된 게임 목록</h1>
     <table>
         <thead>
             <tr>
@@ -35,11 +34,13 @@
                     </div>
                 </td>
                 <td class="discount" th:text="${game.discountPercent + '%'}"></td>
-                <td th:text="${'￦' + #numbers.formatDecimal(game.originalPrice, 0, 'COMMA', 0, 'POINT')}"></td>
-                <td th:text="${'￦' + #numbers.formatDecimal(game.finalPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                <td th:text="${'₩' + #numbers.formatDecimal(game.originalPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                <td th:text="${'₩' + #numbers.formatDecimal(game.finalPrice, 0, 'COMMA', 0, 'POINT')}"></td>
                 <td>
-                    <span th:if="${game.coupon != null}" class="coupon" th:text="${game.coupon.code}"></span>
-                    <button th:if="${game.coupon == null}" class="issue-coupon-btn" th:attr="data-game-id=${game.steamUrl}" onclick="openCouponModal(this)">쿠폰 발급</button>
+                    <span th:if="${#lists.size(game.coupons) > 0}" class="coupon"
+                        th:text="${game.coupons[0].code}"></span>
+                    <button th:if="${#lists.size(game.coupons) == 0}" class="issue-coupon-btn"
+                        th:attr="data-game-id=${game.steamUrl}" onclick="openCouponModal(this)">쿠폰 발급</button>
                 </td>
             </tr>
         </tbody>
@@ -63,6 +64,7 @@
             <button id="issueCouponBtn">발급하기</button>
         </div>
     </div>
+
 
     <!-- JavaScript 부분 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -129,10 +131,10 @@
                     <td>￦${Math.floor(game.originalPrice).toLocaleString()}</td>
                     <td>￦${Math.floor(game.finalPrice).toLocaleString()}</td>
                     <td>
-                        ${game.coupon 
-                            ? `<span class="coupon">${game.coupon.code}</span>`
-                            : `<button class="issue-coupon-btn" data-game-id="${game.steamUrl}" onclick="openCouponModal(this)">쿠폰 발급</button>`
-                        }
+                        ${game.coupon
+                        ? `<span class="coupon">${game.coupon.code}</span>`
+                        : `<button class="issue-coupon-btn" data-game-id="${game.steamUrl}" onclick="openCouponModal(this)">쿠폰 발급</button>`
+                    }
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -145,12 +147,12 @@
         }
 
         // 모달 닫기
-        document.getElementsByClassName('close')[0].onclick = function() {
+        document.getElementsByClassName('close')[0].onclick = function () {
             document.getElementById('couponModal').style.display = 'none';
         }
 
         // 쿠폰 발급 버튼 클릭 이벤트
-        document.getElementById('issueCouponBtn').onclick = function() {
+        document.getElementById('issueCouponBtn').onclick = function () {
             issueCoupon(currentGameId);
         }
 
@@ -159,13 +161,13 @@
                 url: '/api/coupons/issue',
                 method: 'POST',
                 data: { gameId: gameId },
-                success: function(response) {
+                success: function (response) {
                     alert('쿠폰이 발급되었습니다: ' + response.code);
                     document.getElementById('couponModal').style.display = 'none';
                     // 페이지 새로고침 또는 해당 게임의 쿠폰 정보 업데이트
                     location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert('쿠폰 발급 중 오류가 발생했습니다.');
                     console.error("쿠폰 발급 오류:", status, error);
                 }
@@ -173,7 +175,7 @@
         }
 
         // 모달 외부 클릭 시 닫기
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == document.getElementById('couponModal')) {
                 document.getElementById('couponModal').style.display = "none";
             }

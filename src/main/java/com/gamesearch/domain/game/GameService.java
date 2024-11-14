@@ -10,8 +10,6 @@ import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.util.List;
 
-
-
 @Service
 public class GameService {
 
@@ -22,17 +20,28 @@ public class GameService {
     public void init() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        
-        List<Game> games = objectMapper.readValue(new File("src/main/resources/games/extracted_games_data.json"), new TypeReference<List<Game>>() {});
+
+        List<Game> games = objectMapper.readValue(new File("src/main/resources/games/extracted_games_data.json"),
+                new TypeReference<List<Game>>() {
+                });
 
         // 데이터베이스에 저장
         for (Game game : games) {
-            if (!gameRepository.existsByAppId(game.getAppId())) {  // 중복 체크
+            if (!gameRepository.existsByAppId(game.getAppId())) { // 중복 체크
                 gameRepository.save(game);
             }
         }
-    
+
     }
+
+    // 모든 게임을 가져오는 메서드
+    public List<Game> getAllGames() {
+        return gameRepository.findAll(); // 게임 목록 반환
+    }
+
+    // 게임 수를 반환하는 메서드
+    public long getGameCount() {
+        return gameRepository.count(); // 게임 수 반환
+    }
+
 }
-
-

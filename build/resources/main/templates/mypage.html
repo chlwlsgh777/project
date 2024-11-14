@@ -43,7 +43,7 @@
                                 <input type="text" id="newNickname" name="newNickname" required
                                     placeholder="새 닉네임을 입력하세요" maxlength="12">
                                 <button type="button" id="checkNickname">중복 확인</button>
-                                <button type="submit" id="updateNickname" disabled="true">변경</button>
+                                <button type="submit" id="updateNickname" disabled="false">변경</button>
                             </form>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                             <tr th:each="post : ${userPosts}">
                                 <td th:text="${post.category}" class="categoryText"></td>
                                 <td>
-                                    <a th:href="@{/community/{id}(id=${post.id})}" th:text="${post.title}+' &nbsp;&nbsp;[' + ${community.commentCount} +' "class="titleText"
+                                    <a th:href="@{/community/{id}(id=${post.id})}" th:text="${post.title}" class="titleText"
                                         onclick="sessionStorage.setItem('communityReturnUrl', '/mypage')">
                                     </a>
                                 </td>
