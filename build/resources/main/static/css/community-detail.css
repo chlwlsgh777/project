@@ -118,15 +118,15 @@ body {
 .comments-section h3 {
     font-size: 20px;
     font-weight: bold;
-    margin: 10px;
-    color: #00b8c8;
+    margin: 15px;
+    color: white;
 }
 
 .comment {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
     padding: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
     position: relative;
 }
 
@@ -140,8 +140,8 @@ body {
 }
 
 .comment small {
-    font-size: 12px;
-    color: rgb(209, 211, 212);
+    font-size: 14px;
+    color: lightblue;
 }
 
 .comment-form {
@@ -160,7 +160,8 @@ body {
     min-height: 100px;
     background-color: rgba(255, 255, 255, 0.1);
     color: #ddd;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    margin-top: 20px;
     box-sizing: border-box;
     font-size: 14px;
     font-family: Arial, sans-serif;
@@ -186,9 +187,10 @@ body {
     position: absolute;
     right: 10px;
     bottom: 55px;
-    font-size: 12px;
+    font-size: 13px;
     color: #888;
     margin-right: 5px;
+    margin-bottom: 10px;
 }
 
 .comment-content {
@@ -225,6 +227,7 @@ body {
 
 .btn-commentdelete {
     color: #f44336;
+    margin-right: 10px;
 }
 
 .btn-commentedit:hover,
@@ -254,11 +257,12 @@ body {
 
 .edit-form .edit-char-count {
     position: absolute;
-    right: 10px;
+    right: 0px;
     bottom: 35px;
-    font-size: 12px;
+    font-size: 13px;
     color: #888;
-    margin-right: 5px;
+    margin-bottom: 8px;
+
 }
 
 .edit-form .btn-container {
@@ -289,10 +293,15 @@ body {
 .btn-toggle {
     background: none;
     border: none;
-    color: #007bff;
+    color: #00b6ff;
     cursor: pointer;
     padding: 0;
     font-size: 0.9em;
+}
+
+.commenthead {
+    border-bottom: 1px solid darkgrey;
+    padding-bottom: 7px;
 }
 
 @media (max-width: 768px) {

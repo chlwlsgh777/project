@@ -179,16 +179,17 @@ body {
 .add-post-btn {
     cursor: pointer;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 30px;
     text-align: center;
     padding: 0 15px;
-    height: 30px;
+    height: 32px;
     background-color: #00b8c8;
     border-radius: 8px;
     color: white;
     transition: background-color 0.3s ease;
     display: inline-block;
+    width: 70px;
     /* 버튼처럼 보이게 설정 */
 }
 
