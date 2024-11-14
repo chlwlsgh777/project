@@ -97,6 +97,7 @@ public class CommunityService {
         communityRepository.deleteById(id);
     }
 
+    // 마이페이지에서 작성한 게시글 아이디를 통해서 찾기위한 함수.
     public List<Community> findByAuthor(User author) {
         return communityRepository.findByAuthor(author);
     }

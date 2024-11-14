@@ -47,7 +47,7 @@
         <!-- 댓글 섹션 -->
 
         <div class="comments-section">
-            <h3>댓글</h3>
+            <h3>댓글 [<span th:text="${communityDto.commentCount}" id="commentCount"></span>]</h3>
             <div id="commentsContainer">
                 <div th:each="comment : ${comments}" class="comment" th:attr="data-id=${comment.id}">
                     <small
@@ -247,6 +247,7 @@
                     </div>
                 `;
                 commentsContainer.appendChild(newCommentDiv);
+                updateCommentCountFromDOM();
 
                 initializeComments();
             }
@@ -346,6 +347,7 @@
                         .then(() => {
                             const commentDiv = document.querySelector(`.comment[data-id="${commentId}"]`);
                             commentDiv.remove();
+                            updateCommentCountFromDOM();
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -353,6 +355,15 @@
                         });
                 }
             }
+
+            // 댓글 텍스트 옆에 [댓글개수] 숫자 갱신시켜주는 함수.
+            function updateCommentCountFromDOM() {
+                const commentCountElement = document.getElementById('commentCount');
+                const commentsContainer = document.getElementById('commentsContainer');
+                const commentCount = commentsContainer.children.length;
+                commentCountElement.textContent = commentCount;
+            }
+
 
             /*]]>*/
         </script>
