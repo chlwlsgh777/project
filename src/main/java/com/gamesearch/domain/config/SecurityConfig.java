@@ -1,3 +1,4 @@
+// SecurityConfig.java
 package com.gamesearch.domain.config;
 
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -18,10 +20,17 @@ import com.gamesearch.domain.user.CustomUserDetails;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig implements WebMvcConfigurer {
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -32,7 +41,8 @@ public class SecurityConfig implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/check-email", "/check-nickname", "/chat", "/api/check-login",
+                        .ignoringRequestMatchers("/login", "/check-email", "/check-nickname", "/chat",
+                                "/api/check-login",
                                 "/api/games"))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/chat", "/index", "/register", "/login",
@@ -46,7 +56,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler(authenticationSuccessHandler())
-                        .failureUrl("/login?error=true")
+                        .failureHandler(authenticationFailureHandler())
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
@@ -79,6 +89,21 @@ public class SecurityConfig implements WebMvcConfigurer {
             } else {
                 response.sendRedirect("/");
             }
+            logger.info("Authentication successful for user: " + authentication.getName());
+        };
+    }
+
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return (request, response, exception) -> {
+            String errorMessage = exception.getMessage().contains("disabled")
+                    ? "관리자에 의해 정지된 계정입니다."
+                    : "이메일 또는 비밀번호가 올바르지 않습니다.";
+
+            String encodedMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
+            logger.info("Authentication failed: " + exception.getMessage());
+
+            response.sendRedirect("/login?error=true&errorMessage=" + encodedMessage);
         };
     }
 

@@ -3,15 +3,18 @@ body {
     background-color: rgb(25, 32, 48);
     color: #ffffff;
     margin: 0;
-    padding-left: 220px; /* 네비게이션 바 너비 + 여백 */
+    padding-left: 240px;
+    /* 네비게이션 바 너비 + 여백 */
     min-height: 100vh;
-    overflow-x: hidden; /* 가로 스크롤 방지 */
+    overflow-x: hidden;
+    /* 가로 스크롤 방지 */
 }
 
 #header {
     text-align: center;
     margin-bottom: 20px;
-    padding-top: 20px; /* 상단 여백 추가 */
+    padding-top: 20px;
+    /* 상단 여백 추가 */
 }
 
 .main-content {
@@ -40,24 +43,3 @@ body {
     background: #555;
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-    body {
-        padding-left: 0; /* 모바일에서는 왼쪽 패딩 제거 */
-    }
-
-    .global-nav {
-        width: 100%; /* 네비게이션 바를 전체 너비로 */
-        height: auto;
-        position: relative; /* 고정 위치 해제 */
-    }
-
-    .main-content {
-        width: 100%; /* 전체 너비 사용 */
-        padding: 10px; /* 패딩 조정 */
-    }
-
-    #header {
-        padding-top: 10px; /* 상단 여백 조정 */
-    }
-}

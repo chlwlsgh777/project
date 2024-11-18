@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>관리자페이지</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/user-management.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{nav :: global-nav}"></div>
+    <div class="user-management-container">
+        <h1 class="user-management-title">사용자 관리</h1>
+
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>사용자 ID</th>
+                    <th>이메일</th>
+                    <th>닉네임</th>
+                    <th>계정상태</th>
+                    <th>활동/비활동</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.nickname}"></td>
+                    <td th:class="${user.active ? 'status-active' : 'status-inactive'}"
+                        th:text="${user.active ? '활동' : '정지'}"></td>
+                    <td>
+                        <form th:action="@{/admin/users/{userId}/activate(userId=${user.id})}" method="post">
+                            <input type="hidden" name="active" th:value="${!user.active}" />
+                            <button type="submit" class="action-button"
+                                th:text="${user.active ? '정지' : '활동'}"></button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+
+        <div class="no-access" sec:authorize="!hasRole('ADMIN')">
+            <h1>접근 권한이 없습니다</h1>
+            <p>이 페이지는 관리자만 접근할 수 있습니다.</p>
+        </div>
+    </div>
+</body>
+
+</html>

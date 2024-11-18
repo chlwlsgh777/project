@@ -1,7 +1,7 @@
 .global-nav {
     display: flex;
     flex-direction: column;
-    background-color: rgb(8,12,22);
+    background-color: rgb(8, 12, 22);
     padding: 20px;
     width: 200px;
     height: 100vh;
@@ -9,14 +9,15 @@
     left: 0;
     top: 0;
     bottom: 0;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
     align-items: flex-start;
     justify-content: flex-start;
     z-index: 1000;
     overflow-y: auto;
 }
 
-.global-nav a {
+.global-nav a,
+.global-nav div>a {
     color: #ffffff;
     text-decoration: none;
     padding: 10px 20px;
@@ -25,10 +26,12 @@
     margin-bottom: 5px;
     width: calc(100% - 40px);
     text-align: left;
-    font: href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap";
+    font-family: 'Noto Sans KR', sans-serif;
+    display: block;
 }
 
-.global-nav a:hover {
+.global-nav a:hover,
+.global-nav div>a:hover {
     background-color: #444;
 }
 
@@ -41,9 +44,12 @@
     padding-top: 10px;
     border-top: 1px solid #444;
     width: 100%;
+    margin-bottom: 15px;
 }
 
-.nav-auth span, .nav-auth button, .nav-auth a {
+.nav-auth span,
+.nav-auth button,
+.nav-auth a {
     color: #ffffff;
     display: block;
     margin-bottom: 5px;
@@ -62,21 +68,4 @@
 
 .nav-auth button:hover {
     background-color: #555;
-}
-
-@media (max-width: 768px) {
-    .global-nav {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 10px;
-    }
-
-    .global-nav a, .nav-auth {
-        margin-bottom: 5px;
-        padding-left: 10px;
-        padding-right: 10px;
-        width: calc(100% - 20px);
-        text-align: left;
-    }
 }

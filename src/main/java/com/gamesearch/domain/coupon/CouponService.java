@@ -2,7 +2,6 @@ package com.gamesearch.domain.coupon;
 
 import com.gamesearch.domain.discount.Discount;
 import com.gamesearch.domain.game.Game;
-import com.gamesearch.domain.game.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,22 +15,15 @@ public class CouponService {
     @Autowired
     private CouponRepository couponRepository;
 
-    @Autowired
-    private GameRepository gameRepository;
-
     @Transactional
-    public Coupon createCoupon(String code, float discountPercent, LocalDate expirationDate, Long gameId) {
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException("Game not found"));
-
-        // 쿠폰 생성 및 필드 설정
+    public Coupon createCoupon(String code, float discountPercent, LocalDate expirationDate, Game game, Discount discount) {
         Coupon coupon = new Coupon();
         coupon.setCode(code);
         coupon.setDiscountPercent(discountPercent);
         coupon.setExpirationDate(expirationDate);
-        coupon.setGame(game); // 게임 설정
-
-        return couponRepository.save(coupon);
+        coupon.setGame(game); // 게임 객체 설정
+    
+        return couponRepository.save(coupon); // 쿠폰 저장
     }
 
     public List<Coupon> getAllCoupons() {
@@ -55,7 +47,7 @@ public class CouponService {
 
         // 할인 적용 로직 (예: 최종 가격 계산)
         double finalPrice = discount.getFinalPrice() * (1 - (coupon.getDiscountPercent() / 100));
-        
+
         return finalPrice; // 최종 가격 반환
     }
 }

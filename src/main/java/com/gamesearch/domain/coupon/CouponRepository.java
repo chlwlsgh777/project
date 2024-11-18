@@ -8,7 +8,6 @@ import java.util.Optional;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     boolean existsByCode(String code);
-    List<Coupon> findByGameId(Long gameId); // 특정 게임 ID로 쿠폰 조회
     List<Coupon> findByGame_IdAndExpirationDateAfter(Long gameId, LocalDate date);
     Optional<Coupon> findByCode(String code);
 }
