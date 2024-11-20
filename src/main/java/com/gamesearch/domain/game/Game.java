@@ -14,8 +14,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
-
 @Entity
 @Getter
 @Setter
@@ -35,7 +33,6 @@ public class Game {
     @JsonProperty("name")
     @Column(nullable = false)
     private String name;
-
 
     // 출시일
     @JsonProperty("release_date")
@@ -83,21 +80,15 @@ public class Game {
     @JsonProperty("evaluation")
     private String evaluation;
 
-
     // 태그
     @JsonProperty("tags")
     @Column(name = "tag")
     @ElementCollection
     private List<String> tag;
 
-
-    
     // 기본생성자
     public Game() {
 
     }
 
-    
 }
-
-

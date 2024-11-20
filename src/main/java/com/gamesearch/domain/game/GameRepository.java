@@ -1,5 +1,7 @@
 package com.gamesearch.domain.game;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
@@ -8,7 +10,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     boolean existsById(Long id);
 
-    Game findByName(String name);
+    Optional<Game> findByName(String name); // 이름으로 게임 조회
 
-    Game findByAppId(Long appId);
+    Optional<Game> findByAppId(Long appId); // App ID로 게임 조회
 }

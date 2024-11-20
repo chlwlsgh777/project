@@ -12,7 +12,7 @@ class Chatbot:
                 host="localhost",
                 user="root",
                 password="1234",
-                database="steamgame_db"
+                database="gamesearch_db"
             )
             self.cursor = self.db.cursor(dictionary=True)
             logger.info("Database connected successfully")
