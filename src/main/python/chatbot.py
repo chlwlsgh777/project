@@ -183,7 +183,7 @@ class Chatbot:
         keywords = [keyword.strip().lower() for keyword in preferences['genre_or_tag'].split(',')]
 
         query = """
-        SELECT g.name, g.app_id, g.release_date, g.recommendations,
+        SELECT g.name, g.app_id, g.release_date, g.recommendations, g.price,
                GROUP_CONCAT(DISTINCT gg.genre SEPARATOR ', ') AS genres,
                GROUP_CONCAT(DISTINCT gt.tag SEPARATOR ', ') AS tags,
                GROUP_CONCAT(DISTINCT gc.categories SEPARATOR ', ') AS categories
@@ -233,7 +233,7 @@ class Chatbot:
     # 첫 입력에 랜덤을 입력했을때 실행되는 함수
     def recommend_random_games(self, user_id):
         query = """
-        SELECT g.name, g.app_id, g.release_date, g.recommendations,
+        SELECT g.name, g.app_id, g.release_date, g.recommendations, g.price
                GROUP_CONCAT(DISTINCT gg.genre SEPARATOR ', ') AS genres,
                GROUP_CONCAT(DISTINCT gt.tag SEPARATOR ', ') AS tags,
                GROUP_CONCAT(DISTINCT gc.categories SEPARATOR ', ') AS categories
@@ -310,7 +310,8 @@ class Chatbot:
                 "release_date": game['release_date'].strftime('%Y-%m-%d'),
                 "categories": game['categories'],
                 "genres": game['genres'],
-                "tags": game['tags']
+                "tags": game['tags'],
+                "price": game['price']
             }
             for game in results
         ]
