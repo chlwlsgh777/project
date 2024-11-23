@@ -2,6 +2,8 @@ package com.gamesearch.domain.coupon;
 
 import com.gamesearch.domain.discount.Discount;
 import com.gamesearch.domain.game.Game;
+import com.gamesearch.domain.user.User;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +32,10 @@ public class Coupon {
     @JoinColumn(name = "game_id", nullable = false) // 외래 키 설정
     private Game game; // Game 객체로 변경
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false) // User 관계 추가
+    private User user;
+
     public Coupon() {
         // 기본 생성자 필요 (JPA에서 사용)
     }
@@ -38,7 +44,7 @@ public class Coupon {
         this.code = code;
         this.discountPercent = discountPercent;
         this.expirationDate = expirationDate;
-        this.game = game; // Game 객체로 변경
+        this.game = game;
     }
 
     // Discount와의 관계를 추가할 경우 아래와 같이 추가할 수 있음

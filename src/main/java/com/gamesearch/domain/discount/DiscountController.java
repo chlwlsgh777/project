@@ -1,6 +1,7 @@
 package com.gamesearch.domain.discount;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,10 +29,17 @@ public class DiscountController {
         return "discount";
     }
 
+    @GetMapping("/")
+    public String home(Model model) {
+        List<Discount> topSellingGames = steamService.getTopSellingGamesKR();
+        model.addAttribute("topSellingGames", topSellingGames);
+        return "index";
+    }
+
     @GetMapping("/api/games")
     @ResponseBody
     public Map<String, Object> getGames(@RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size) {
         List<Discount> games = steamService.getDiscountedGames(page, size);
         boolean hasMore = games.size() >= size;
         return Map.of("games", games, "hasMore", hasMore);

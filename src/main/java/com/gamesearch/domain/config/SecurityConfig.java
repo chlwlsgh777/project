@@ -4,6 +4,8 @@ package com.gamesearch.domain.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -94,18 +96,23 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public AuthenticationFailureHandler authenticationFailureHandler() {
-        return (request, response, exception) -> {
-            String errorMessage = exception.getMessage().contains("disabled")
-                    ? "관리자에 의해 정지된 계정입니다."
-                    : "이메일 또는 비밀번호가 올바르지 않습니다.";
+public AuthenticationFailureHandler authenticationFailureHandler() {
+    return (request, response, exception) -> {
+        String errorMessage;
+        if (exception instanceof DisabledException) {
+            errorMessage = "관리자에 의해 정지된 계정입니다.";
+        } else if (exception instanceof BadCredentialsException) {
+            errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
+        } else {
+            errorMessage = "로그인에 실패했습니다. 다시 시도해주세요.";
+        }
 
-            String encodedMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
-            logger.info("Authentication failed: " + exception.getMessage());
+        String encodedMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
+        logger.info("Authentication failed: " + exception.getMessage());
 
-            response.sendRedirect("/login?error=true&errorMessage=" + encodedMessage);
-        };
-    }
+        response.sendRedirect("/login?error=true&errorMessage=" + encodedMessage);
+    };
+}
 
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {

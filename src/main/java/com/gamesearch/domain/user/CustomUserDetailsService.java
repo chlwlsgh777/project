@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         if (!user.isActive()) {
-            throw new DisabledException("This account is suspended by an administrator.");
+            throw new DisabledException("This account is disabled by an administrator.");
         }
 
         return new CustomUserDetails(user);

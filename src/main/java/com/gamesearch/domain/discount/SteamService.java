@@ -16,10 +16,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+//크롤링 해오는 기능
 @Service
 public class SteamService {
     private static final Logger logger = LoggerFactory.getLogger(SteamService.class);
     private static final String STEAM_DISCOUNT_URL = "https://store.steampowered.com/search/?specials=1&supportedlang=koreana&ndl=1";
+    private static final String STEAM_TOP_SELLING_KR_URL = "https://store.steampowered.com/charts/topselling/KR";
 
     @Autowired
     private CouponService couponService;
@@ -83,6 +85,50 @@ public class SteamService {
         return new Discount(name, discountPercentValue, originalPriceValue, discountedPriceValue, imageUrl, steamUrl);
     }
 
+    public List<Discount> getTopSellingGamesKR() {
+        List<Discount> games = new ArrayList<>();
+        try {
+            Document doc = Jsoup.connect(STEAM_TOP_SELLING_KR_URL).get();
+
+            // 정확한 HTML 선택자를 확인하세요
+            Elements gameElements = doc.select(".weeklytopsellers_TableRow_2-RN6");
+
+            if (gameElements.isEmpty()) {
+                logger.warn("No games found. HTML structure might have changed.");
+                return games;
+            }
+
+            for (Element game : gameElements) {
+                games.add(parseTopSellingGameElement(game));
+            }
+
+            logger.info("Fetched {} top selling games from Korea", games.size());
+        } catch (IOException e) {
+            logger.error("Error fetching top selling games from Steam Korea", e);
+        }
+
+        return games;
+    }
+
+    private Discount parseTopSellingGameElement(Element game) {
+        String name = game.select("div.weeklytopsellers_GameName_3qJD8").text();
+        String discountPercent = game.select("div.weeklytopsellers_Discount_1EYzg").text().replace("-", "").replace("%",
+                "");
+        String originalPrice = game.select("div.weeklytopsellers_OriginalPrice_3Gzk4").text().replace("₩", "")
+                .replace(",", "");
+        String discountedPrice = game.select("div.weeklytopsellers_SalePrice_1j76X").text().replace("₩", "")
+                .replace(",", "");
+
+        int discountPercentValue = parseIntSafely(discountPercent);
+        double originalPriceValue = parseDoubleSafely(originalPrice);
+        double discountedPriceValue = parseDoubleSafely(discountedPrice);
+
+        String imageUrl = game.select("img.weeklytopsellers_GameImage_1_olf").attr("src");
+        String steamUrl = game.select("a.weeklytopsellers_TopChartItem_3_VcD").attr("href");
+
+        return new Discount(name, discountPercentValue, originalPriceValue, discountedPriceValue, imageUrl, steamUrl);
+    }
+
     private Long extractGameIdFromSteamUrl(String steamUrl) {
         // Steam URL에서 게임 ID 추출
         String[] parts = steamUrl.split("/");
@@ -113,4 +159,5 @@ public class SteamService {
             return 0.0;
         }
     }
+
 }
