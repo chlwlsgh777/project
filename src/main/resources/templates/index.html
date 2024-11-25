@@ -8,128 +8,18 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/chatbot.css}">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            display: flex;
-            justify-content: center;
-            padding-top: 100px;
-            min-height: 100vh;
-        }
-
-        .box-container {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            height: fit-content;
-        }
-
-        .box {
-            width: 250px;
-            height: 150px;
-            background: linear-gradient(145deg, #1e2a4a, #2a3b6b);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #ffffff;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        
-
-        .box:hover {
-            transform: translateY(-5px);
-
-        }
-
-        .box:hover:before {
-            transform: scale(1);
-        }
-
-        .box-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .box-description {
-            font-size: 14px;
-            text-align: center;
-            opacity: 0.8;
-            padding: 0 20px;
-        }
-
-        .box:before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 80%);
-            transform: scale(0);
-            transition: transform 0.4s ease-out;
-        }
-
-        .top-selling {
-            width: 100%;
-            max-width: 1200px;
-            margin-top: 50px;
-        }
-
-        .top-selling h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #1e2a4a;
-        }
-
-        .game-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .game-item {
-            border: 1px solid black;
-            margin: 10px;
-            padding: 10px;
-        }
-
-        .game-item:hover {
-            transform: translateY(-5px);
-        }
-
-        .game-item img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-        }
-
-        .game-info {
-            padding: 10px;
-        }
-
-        .game-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .game-price {
-            font-size: 14px;
-            color: #2a3b6b;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
 
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
+
+    <div class="icon" style="display: flex; align-items: center; justify-content: center; margin-bottom: 50px;">
+        <a th:href="@{/index}" style="display: flex; align-items: center;">
+            <img th:src="@{/images/icon.png}" alt="icon" class="icon-image">
+            <h1 style="margin-left: 10px;">겜색기</h1>
+        </a>
+    </div>
 
     <div class="box-container">
         <a class="box" th:href="@{/chatbot}">
@@ -146,21 +36,17 @@
         </a>
     </div>
 
-    <div class="top-selling">
-        <h2>한국 스팀 인기 상품</h2>
-        <div th:if="${not #lists.isEmpty(topSellingGames)}" class="game-list">
-            <div th:each="game : ${topSellingGames}" class="game-item">
-                <img th:src="${game.imageUrl}" th:alt="${game.name + ' 이미지'}"
-                    onerror="this.src='/img/default-game.png';">
-                <div class="game-info">
-                    <div class="game-title" th:text="${game.name}"></div>
-                    <div class="game-price"
-                        th:text="${'₩' + #numbers.formatDecimal(game.finalPrice, 0, 'COMMA', 0, 'POINT')}"></div>
-                </div>
-            </div>
+    <div class="under10000won-container">
+        <div class="under10000won">
+            <h2 style="text-align: center;">가볍게 즐기는 게임</h2>
+            <img th:src="@{/images/under10000won.png}" alt="10000won" class="under10000won">
         </div>
-        <div th:if="${#lists.isEmpty(topSellingGames)}">
-            <p>현재 인기 상품 정보를 불러올 수 없습니다.</p>
+    </div>
+
+    <div class="topselling-container">
+        <div class="topselling">
+            <h2 style="text-align: center;">인기게임</h2>
+            <img th:src="@{/images/topselling.png}" alt="topselling" class="topselling-image">
         </div>
     </div>
 

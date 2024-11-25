@@ -1,0 +1,107 @@
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    flex-direction: column;
+    /* 세로로 쌓이도록 설정 */
+}
+
+.box-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    height: fit-content;
+    margin-bottom: 30px;
+    /* box-container와 이미지 간 간격을 추가 */
+    border-bottom: 1px solid;
+    padding-bottom: 50px;
+}
+
+.box {
+    width: 250px;
+    height: 150px;
+    background: linear-gradient(145deg, #1e2a4a, #2a3b6b);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.box:hover {
+    transform: translateY(-5px);
+}
+
+.box:hover:before {
+    transform: scale(1);
+}
+
+.box-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.box-description {
+    font-size: 14px;
+    text-align: center;
+    opacity: 0.8;
+    padding: 0 20px;
+}
+
+.box:before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 80%);
+    transform: scale(0);
+    transition: transform 0.4s ease-out;
+}
+
+.under10000won-container {
+    padding-bottom: 50px;
+    border-bottom: 1px solid;
+    display: block;
+    margin-top: 30px;
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    /* 이미지 중앙 정렬 */
+}
+
+.topselling-container {
+    padding-bottom: 50px;
+    border-bottom: 1px solid;
+    display: block;
+    margin-top: 30px;
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    /* 이미지 중앙 정렬 */
+}
+
+.under10000won,
+.topselling-image {
+    max-width: 100%;
+    /* 화면 크기에 맞게 조정 */
+    height: auto;
+    /* 비율 유지 */
+}
+
+.icon-image{
+    width: 200px;
+
+}

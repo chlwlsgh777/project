@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.gamesearch.domain.game.Game;
+
 import java.util.List;
 import java.util.Map;
 
@@ -29,13 +31,6 @@ public class DiscountController {
         return "discount";
     }
 
-    @GetMapping("/")
-    public String home(Model model) {
-        List<Discount> topSellingGames = steamService.getTopSellingGamesKR();
-        model.addAttribute("topSellingGames", topSellingGames);
-        return "index";
-    }
-
     @GetMapping("/api/games")
     @ResponseBody
     public Map<String, Object> getGames(@RequestParam(defaultValue = "0") int page,
@@ -43,5 +38,12 @@ public class DiscountController {
         List<Discount> games = steamService.getDiscountedGames(page, size);
         boolean hasMore = games.size() >= size;
         return Map.of("games", games, "hasMore", hasMore);
+    }
+
+    @GetMapping("/topselling")
+    public String getTopSellingGames(Model model) {
+        List<Game> games = steamService.getTopSellingGamesKR();
+        model.addAttribute("games", games);
+        return "index"; // Thymeleaf 템플릿 이름
     }
 }

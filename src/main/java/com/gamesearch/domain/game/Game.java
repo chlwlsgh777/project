@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 @Getter
 @Setter
-@ToString
 public class Game {
 
     // 키 값
@@ -86,9 +84,28 @@ public class Game {
     @ElementCollection
     private List<String> tag;
 
+    private String imageUrl;
+    private String steamUrl;
+
     // 기본생성자
     public Game() {
 
     }
 
+    public Game(String name, Double price, String imageUrl, String steamUrl) {
+        this.name = name;
+        this.price = price;
+        this.imageUrl = imageUrl;
+        this.steamUrl = steamUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "name='" + name + '\'' +
+                ", price='" + price + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", steamUrl='" + steamUrl + '\'' +
+                '}';
+    }
 }
