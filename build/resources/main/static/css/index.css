@@ -14,13 +14,12 @@ body {
     height: fit-content;
     margin-bottom: 30px;
     /* box-container와 이미지 간 간격을 추가 */
-    border-bottom: 1px solid;
     padding-bottom: 50px;
 }
 
 .box {
-    width: 250px;
-    height: 150px;
+    width: 400px;
+    height: 500px;
     background: linear-gradient(145deg, #1e2a4a, #2a3b6b);
     border-radius: 20px;
     display: flex;
@@ -69,7 +68,6 @@ body {
 
 .under10000won-container {
     padding-bottom: 50px;
-    border-bottom: 1px solid;
     display: block;
     margin-top: 30px;
     width: 100%;
@@ -82,7 +80,6 @@ body {
 
 .topselling-container {
     padding-bottom: 50px;
-    border-bottom: 1px solid;
     display: block;
     margin-top: 30px;
     width: 100%;

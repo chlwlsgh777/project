@@ -2,10 +2,10 @@
     <div class="nav-auth">
         <div sec:authorize="isAuthenticated()">
             <span th:text="${session.userName} + '님 환영합니다'">사용자님 환영합니다</span>
-            <div style="display:flex; margin-top:5px;">
+            <div style="display: flex; margin-top: 5px;">
                 <button onclick="location.href='/mypage'" class="nav-button" aria-label="마이페이지로 이동"
-                    style="flex:1; margin-right:5px;">마이페이지</button>
-                <form th:action="@{/logout}" method="post" style="flex:1; margin:0;">
+                    style="flex: 1; margin-right: 5px;">마이페이지</button>
+                <form th:action="@{/logout}" method="post" style="flex: 1; margin: 0;">
                     <button type="submit" class="nav-button" aria-label="로그아웃">로그아웃</button>
                 </form>
             </div>
@@ -16,11 +16,12 @@
         </div>
     </div>
 
-    <a th:href="@{/}">홈</a>
-    <div sec:authorize="hasRole('ADMIN')">
-        <a th:href="@{/admin/dashboard}">관리자페이지</a>
+    <div class="nav-links">
+        <a th:href="@{/}">홈</a>
+        <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">관리자페이지</a>
+        <a th:href="@{/chatbot}">겜색기</a>
+        <a th:href="@{/community}">커뮤니티</a>
+        <a th:href="@{/discount}">할인목록</a>
     </div>
-    <a th:href="@{/chatbot}">겜색기</a>
-    <a th:href="@{/community}">커뮤니티</a>
-    <a th:href="@{/discount}">할인목록</a>
 </nav>
+
