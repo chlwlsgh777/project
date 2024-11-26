@@ -8,8 +8,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     boolean existsByAppId(Long appId);
 
-    boolean existsById(Long id);
-
     Optional<Game> findByName(String name); // 이름으로 게임 조회
 
     Optional<Game> findByAppId(Long appId); // App ID로 게임 조회

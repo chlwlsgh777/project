@@ -61,20 +61,18 @@ public class CouponService {
 
     @Transactional
     public Coupon issueCoupon(Long gameId, User user) {
-        // 이미 발급된 쿠폰이 있는지 확인
-        if (couponRepository.existsByGameIdAndUser(gameId, user)) {
-            throw new RuntimeException("이미 이 게임의 쿠폰을 발급받으셨습니다.");
-        }
-
         Game game = gameService.findByAppId(gameId);
-        if (game == null) {
-            throw new RuntimeException("해당 게임을 찾을 수 없습니다.");
+
+        // Pessimistic Lock으로 게임에 대한 쿠폰 발급 여부 확인
+        boolean hasCoupon = couponRepository.existsByGame_IdAndUser_Id(game.getId(), user.getId());
+        if (hasCoupon) {
+            throw new RuntimeException("이미 이 게임의 쿠폰을 발급받으셨습니다.");
         }
 
         // 쿠폰 생성 로직
         String couponCode = generateCouponCode();
-        LocalDate expirationDate = LocalDate.now().plusDays(30); // 30일 후 만료
-        float discountPercent = 10; // 10% 할인
+        LocalDate expirationDate = LocalDate.now().plusDays(30);
+        float discountPercent = 10;
 
         Coupon coupon = new Coupon(couponCode, discountPercent, expirationDate, game);
         coupon.setUser(user);
@@ -85,5 +83,4 @@ public class CouponService {
     private String generateCouponCode() {
         return "COUPON-" + UUID.randomUUID().toString().substring(0, 8);
     }
-
 }

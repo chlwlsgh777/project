@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@Table(name = "coupon")
 public class Coupon {
 
     @Id

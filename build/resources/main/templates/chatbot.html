@@ -122,7 +122,7 @@
             <strong style="color: black;">카테고리 :</strong> ${game.categories || 'N/A'}<br><br>
             <strong style="color: black;">장르 :</strong> ${game.genres || 'N/A'}<br><br>
             <strong style="color: black;">태그 :</strong> ${game.tags || 'N/A'}<br><br>
-            <strong style="color: black;">가격 :</strong> $${game.price || 'N/A'}<br><br>
+            <strong style="color: black;">가격 :</strong> $${game.price || '0'}<br><br>
             `;
             gameBox.appendChild(details);
 
@@ -213,6 +213,11 @@
         }
         // 쿠폰 발급 함수
         function issueCoupon(gameId) {
+
+            if (!confirm('쿠폰을 발급받으시겠습니까?\n 쿠폰 유효기간은 발급 날짜로부터 30일 입니다.')) {
+                return; // 취소 버튼을 누르면 함수 종료
+            }
+
             // 버튼 비활성화
             const button = event.target;
             button.disabled = true;
