@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.gamesearch.domain.coupon.Coupon;
 import com.gamesearch.domain.coupon.CouponService;
+import com.gamesearch.domain.game.Game;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
 public class SteamService {
     private static final Logger logger = LoggerFactory.getLogger(SteamService.class);
     private static final String STEAM_DISCOUNT_URL = "https://store.steampowered.com/search/?specials=1&supportedlang=koreana&ndl=1";
+    private static final String STEAM_TOP_SELLING_KR_URL = "https://store.steampowered.com/charts/topselling/KR";
 
     @Autowired
     private CouponService couponService;
@@ -35,8 +37,8 @@ public class SteamService {
                 double newPrice = couponService.applyCoupon(game, coupon.getCode());
                 if (newPrice < game.getFinalPrice()) {
                     game.setFinalPrice(newPrice);
-                    game.addCoupon(coupon); // 수정된 부분: addCoupon 메서드 사용
-                    break; // 가장 좋은 쿠폰 하나만 적용
+                    game.addCoupon(coupon);
+                    break;
                 }
             }
         }
@@ -53,9 +55,9 @@ public class SteamService {
             Elements gameElements = doc.select("#search_resultsRows > a");
 
             for (Element game : gameElements) {
-                games.add(parseGameElement(game));
+                games.add(parseDiscountGameElement(game));
                 if (games.size() >= size) {
-                    break; // 원하는 수의 게임을 가져오면 종료
+                    break;
                 }
             }
 
@@ -67,7 +69,7 @@ public class SteamService {
         return games;
     }
 
-    private Discount parseGameElement(Element game) {
+    private Discount parseDiscountGameElement(Element game) {
         String name = game.select(".title").text();
         String discountPercent = game.select(".discount_pct").text().replace("-", "").replace("%", "");
         String originalPrice = game.select(".discount_original_price").text().replace("₩", "").replace(",", "");
@@ -83,17 +85,45 @@ public class SteamService {
         return new Discount(name, discountPercentValue, originalPriceValue, discountedPriceValue, imageUrl, steamUrl);
     }
 
+    public List<Game> getTopSellingGamesKR() {
+        List<Game> games = new ArrayList<>();
+        try {
+            Document doc = Jsoup.connect(STEAM_TOP_SELLING_KR_URL).get();
+            Elements gameElements = doc.select(".weeklytopsellers_TableRow_3D6u5"); // 수정된 셀렉터
+
+            for (Element gameElement : gameElements) {
+                String name = gameElement.select(".weeklytopsellers_GameName_1n_4-").text(); // 게임 이름
+                String priceString = gameElement.select(".weeklytopsellers_PriceCell_3v4Ys").text().replace("₩", "")
+                        .replace(",", ""); // 가격
+                String imageUrl = gameElement.select("img").attr("src"); // 이미지 URL
+                String steamUrl = gameElement.select("a").attr("href"); // Steam URL
+
+                // 가격 파싱 (무료인 경우 0으로 처리)
+                Double price = priceString.isEmpty() || priceString.equalsIgnoreCase("무료")
+                        ? 0.0
+                        : parseDoubleSafely(priceString);
+
+                // Game 객체로 변환
+                Game game = new Game(name, price, imageUrl, steamUrl);
+                games.add(game);
+            }
+            logger.info("Fetched {} top-selling games from Korea", games.size());
+        } catch (IOException e) {
+            logger.error("Error fetching top-selling games from Steam Korea", e);
+        }
+        return games;
+    }
+
     private Long extractGameIdFromSteamUrl(String steamUrl) {
-        // Steam URL에서 게임 ID 추출
         String[] parts = steamUrl.split("/");
-        if (parts.length > 4) { // URL에서 게임 ID 추출
+        if (parts.length > 4) {
             try {
-                return Long.parseLong(parts[4]); // 4번째 요소가 게임 ID임
+                return Long.parseLong(parts[4]);
             } catch (NumberFormatException e) {
                 logger.warn("Failed to extract game ID from URL: {}", steamUrl);
             }
         }
-        return null; // 유효하지 않은 경우 null 반환
+        return null;
     }
 
     private int parseIntSafely(String value) {

@@ -1,14 +1,15 @@
 package com.gamesearch.domain.game;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import jakarta.annotation.PostConstruct;
-import java.io.File;
 import java.util.List;
+import java.io.File;
 
 @Service
 public class GameService {
@@ -44,4 +45,13 @@ public class GameService {
         return gameRepository.count(); // 게임 수 반환
     }
 
+    public Game findByAppId(Long appId) {
+        return gameRepository.findByAppId(appId)
+                .orElseThrow(() -> new RuntimeException("Game with appId " + appId + " not found"));
+    }
+
+    public Game findById(Long id) {
+        return gameRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Game with id " + id + " not found"));
+    }
 }

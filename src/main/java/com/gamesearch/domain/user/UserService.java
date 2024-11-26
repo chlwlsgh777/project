@@ -100,6 +100,14 @@ public class UserService {
     }
 
     public long getUserCount() {
-        return userRepository.count(); // 예시: JPA Repository 사용
+        return userRepository.count(); // JPA Repository를 사용하여 사용자 수 반환
+    }
+
+    @Transactional
+    public void toggleUserActiveStatus(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setActive(!user.isActive()); // 현재 활성화 상태를 반전시킴
+        userRepository.save(user); // 변경된 사용자 정보를 저장
     }
 }

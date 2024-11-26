@@ -1,15 +1,21 @@
 package com.gamesearch.domain.user;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
-    private String username;
-    private String password;
-    private Collection<? extends GrantedAuthority> authorities;
-    private String name;
+
+    private final User user;
+    private final Collection<? extends GrantedAuthority> authorities;
+
+    public CustomUserDetails(User user) {
+        this.user = user;
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -18,12 +24,12 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.password;
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.username;
+        return user.getEmail();
     }
 
     @Override
@@ -43,26 +49,10 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isActive();
     }
 
     public String getName() {
-        return this.name;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return user.getName();
     }
 }

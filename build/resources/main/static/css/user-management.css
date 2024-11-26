@@ -1,0 +1,92 @@
+/* user-management.css */
+
+.user-management-container {
+    margin-left: 20px; /* 네비게이션 바의 너비 + 여백 */
+    padding: 20px;
+}
+
+.user-management-title {
+    color: #00b8c8;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #333;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-table th,
+.user-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #444;
+}
+
+.user-table th {
+    background-color: #00b8c8;
+    color: #fff;
+    font-weight: bold;
+}
+
+.user-table tr:hover {
+    background-color: #444;
+}
+
+.user-table td {
+    color: #f4f4f4;
+}
+
+.status-active {
+    color: #4CAF50;
+}
+
+.status-inactive {
+    color: #e53935;
+}
+
+.action-button {
+    background-color: #00b8c8;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #008c99;
+}
+
+.no-access {
+    background-color: #e53935;
+    color: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-access h1 {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .user-management-container {
+        margin-left: 0;
+        padding-top: 80px; /* 모바일에서 네비게이션 바 높이 고려 */
+    }
+
+    .user-table {
+        font-size: 14px;
+    }
+
+    .user-table th,
+    .user-table td {
+        padding: 8px;
+    }
+}

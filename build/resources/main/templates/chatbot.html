@@ -121,10 +121,16 @@
             <strong style="color: black;">출시일 :</strong> ${game.release_date || 'N/A'}<br><br>
             <strong style="color: black;">카테고리 :</strong> ${game.categories || 'N/A'}<br><br>
             <strong style="color: black;">장르 :</strong> ${game.genres || 'N/A'}<br><br>
-            <strong style="color: black;">태그 :</strong> ${game.tags || 'N/A'}
+            <strong style="color: black;">태그 :</strong> ${game.tags || 'N/A'}<br><br>
+            <strong style="color: black;">가격 :</strong> $${game.price || 'N/A'}<br><br>
             `;
             gameBox.appendChild(details);
 
+            // 쿠폰 발급 버튼
+            const couponButton = document.createElement('button');
+            couponButton.textContent = '쿠폰 발급받기';
+            couponButton.onclick = () => issueCoupon(game.app_id, userId);
+            gameBox.appendChild(couponButton);
             return gameBox;
         }
 
@@ -203,6 +209,44 @@
             if (i === text.length) {
                 const messagesContainer = document.getElementById('chat-messages');
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            // 쿠폰 발급 함수
+            function issueCoupon(gameId, userId) {
+                // 로컬 스토리지에서 사용자의 쿠폰 발급 여부 확인
+                const userCoupons = JSON.parse(localStorage.getItem('userCoupons')) || {};
+
+                if (userCoupons[userId] && userCoupons[userId].includes(gameId)) {
+                    alert('이미 이 게임의 쿠폰을 발급받으셨습니다.');
+                    return;
+                }
+
+                // 서버에 쿠폰 발급 요청
+                fetch('/issue-coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId, gameId }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('쿠폰이 성공적으로 발급되었습니다!');
+
+                            // 로컬 스토리지 업데이트
+                            if (!userCoupons[userId]) {
+                                userCoupons[userId] = [];
+                            }
+                            userCoupons[userId].push(gameId);
+                            localStorage.setItem('userCoupons', JSON.stringify(userCoupons));
+                        } else {
+                            alert('쿠폰 발급에 실패했습니다. ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('쿠폰 발급 중 오류가 발생했습니다.');
+                    });
             }
         }
     </script>

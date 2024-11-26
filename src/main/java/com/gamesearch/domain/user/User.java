@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -32,6 +33,16 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    private Boolean active; // Boolean 객체 타입 사용
+
+    @PrePersist // 엔티티가 저장되기 전에 active 값을 강제로 true로 설정
+    public void prePersist() {
+        if (this.active == null) { // null이면 true로 설정
+            this.active = true;
+        }
+    }
+
     public enum Role {
         USER, ADMIN
     }
@@ -39,4 +50,9 @@ public class User {
     public boolean isAdmin() {
         return this.role == Role.ADMIN;
     }
+
+    public boolean isActive() {
+        return this.active != null && this.active; // active가 true일 경우 true 반환
+    }
+
 }

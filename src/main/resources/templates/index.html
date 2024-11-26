@@ -8,89 +8,44 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/chatbot.css}">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            display: flex;
-            justify-content: center;
-            padding-top: 100px;
-            min-height: 100vh;
-        }
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
 
-        .box-container {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-        }
-
-        .box {
-            width: 250px;
-            height: 150px;
-            background: linear-gradient(145deg, #1e2a4a, #2a3b6b);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #ffffff;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .box:before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 80%);
-            transform: scale(0);
-            transition: transform 0.4s ease-out;
-        }
-
-        .box:hover {
-            transform: translateY(-5px);
-            
-        }
-
-        .box:hover:before {
-            transform: scale(1);
-        }
-
-        .box-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .box-description {
-            font-size: 14px;
-            text-align: center;
-            opacity: 0.8;
-            padding: 0 20px;
-        }
-    </style>
 </head>
+
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
+    <div th:replace="~{header}"></div>
 
     <div class="box-container">
-        <a class="box" th:href="@{/chatbot}">
+        <a class="box chatbot-box" th:href="@{/chatbot}">
             <div class="box-title">겜색기</div>
             <div class="box-description">쳇봇을 이용한 게임추천</div>
         </a>
-        <a class="box" th:href="@{/community}">
+        <a class="box community-box" th:href="@{/community}">
             <div class="box-title">커뮤니티</div>
             <div class="box-description">게임 정보 공유</div>
         </a>
-        <a class="box" th:href="@{/discount}">
+        <a class="box discount-box" th:href="@{/discount}">
             <div class="box-title">스팀 할인</div>
             <div class="box-description">현재 할인중인 스팀게임</div>
         </a>
     </div>
 
+    <div class="under10000won-container">
+        <div class="under10000won">
+            <h2 style="text-align: center; margin-bottom: 50px;">가볍게 즐기는 게임</h2>
+            <img th:src="@{/images/under10000won.png}" alt="10000won" class="under10000won">
+        </div>
+    </div>
+
+    <div class="topselling-container">
+        <div class="topselling">
+            <h2 style="text-align: center; margin-bottom: 50px;">인기게임</h2>
+            <img th:src="@{/images/topselling.png}" alt="topselling" class="topselling-image">
+        </div>
+    </div>
+
 </body>
+
 </html>

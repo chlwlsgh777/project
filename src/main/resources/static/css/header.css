@@ -1,0 +1,22 @@
+@font-face {
+    font-family: 'DNFBitBitv2';
+    font-style: normal;
+    font-weight: 400;
+    src: url('//cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf') format('opentype');
+}
+
+.icon-text {
+    font-family: 'DNFBitBitv2';
+    /* 특정 폰트 적용 */
+    margin-left: 10px;
+    /* 아이콘과 텍스트 간의 간격 */
+
+    font-size: 80px;
+}
+
+.icon a {
+    text-decoration: none;
+    /* 링크의 밑줄 제거 */
+    color: inherit;
+    /* 텍스트 색상을 부모 요소와 동일하게 설정 */
+}
