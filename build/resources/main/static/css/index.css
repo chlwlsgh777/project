@@ -24,13 +24,20 @@ body {
     border-radius: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    text-align: center;
+    padding: 20px;
     color: #ffffff;
     text-decoration: none;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+}
+
+.box-title {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 10px;
 }
 
 .box:hover {
@@ -41,17 +48,11 @@ body {
     transform: scale(1);
 }
 
-.box-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
 .box-description {
     font-size: 14px;
-    text-align: center;
     opacity: 0.8;
-    padding: 0 20px;
+    width: 100%;
+    /* 전체 너비 차지 */
 }
 
 .box:before {
@@ -98,7 +99,27 @@ body {
     /* 비율 유지 */
 }
 
-.icon-image{
+.icon-image {
     width: 200px;
 
+}
+
+.discount-box {
+    background-image: url('/images/steambackground.jpg');
+    background-size: cover;
+    background-position: center 20px;
+    color: white;
+}
+
+.chatbot-box {
+    background-image: url('/images/chatbot.jpg');
+    background-size: cover;
+    background-position: center -20px;
+    color: white;
+}
+.community-box {
+    background-image: url('/images/community.png');
+    background-size: cover;
+    background-position: center;
+    color: white;
 }
