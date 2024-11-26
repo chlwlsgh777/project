@@ -66,7 +66,7 @@ public class CouponService {
             throw new RuntimeException("이미 이 게임의 쿠폰을 발급받으셨습니다.");
         }
 
-        Game game = gameService.findById(gameId);
+        Game game = gameService.findByAppId(gameId);
         if (game == null) {
             throw new RuntimeException("해당 게임을 찾을 수 없습니다.");
         }

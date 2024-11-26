@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 상세</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community-detail.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+
+<body>
+    <div th:replace="~{nav :: global-nav}"></div>
+    <div class="community-layout">
+        <div class="community-detail">
+            <h2 class="community-detail-title" th:text="${communityDto.title}">게시글 제목</h2>
+            <div class="community-detail-info">
+                <span class="category" th:text="${communityDto.category}">카테고리</span>
+                <span class="author" th:text="'작성자 : ' + ${communityDto.authorName}">작성자: 홍길동</span>
+                <span class="date"
+                    th:text="'작성날짜 : '+ ${#temporals.format(communityDto.date, 'yyyy-MM-dd &nbsp; HH:mm')}"></span>
+                <span class="view-count" th:text="'조회수 : ' + ${communityDto.viewCount}"></span>
+            </div>
+            <div class="community-detail-content"
+                th:utext="${#strings.replace(#strings.escapeXml(communityDto.description), '\n', '<br>')}"></div>
+        </div>
+
+        <!-- 게시글 수정/삭제/목록 이동 버튼 -->
+        <div class="community-detail-actions">
+            <div class="left-spacer"></div>
+            <button onclick="goToList()" class="btn-list">목록으로</button>
+            <div class="edit-delete-container">
+                <th:block th:if="${currentUsername != null and communityDto.authorEmail != null}">
+                    <th:block th:if="${currentUsername == communityDto.authorEmail}">
+                        <button onclick="editPost()" class="btn-edit">수정</button>
+                        <button onclick="deletePost()" class="btn-delete">삭제</button>
+                    </th:block>
+                </th:block>
+            </div>
+        </div>
+
+
+
+        <!-- 댓글 섹션 -->
+
+        <div class="comments-section">
+            <h3>댓글 [<span th:text="${communityDto.commentCount}" id="commentCount"></span>]</h3>
+            <div id="commentsContainer">
+                <div th:each="comment : ${comments}" class="comment" th:attr="data-id=${comment.id}">
+                    <div class="commenthead">
+                        <small
+                            th:text="${comment.authorName + '&nbsp;(' + #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm') + ')'}"></small>
+                    </div>
+                    <p class="comment-content" th:text="${comment.content}"></p>
+                    <button class="btn-toggle" style="display: none;">펼치기</button>
+                    <div th:if="${currentUsername != null and comment.authorEmail != null and currentUsername == comment.authorEmail}"
+                        class="comment-actions">
+                        <button class="btn-commentedit" th:onclick="'editComment(' + ${comment.id} + ')'">수정</button>
+                        <button class="btn-commentdelete"
+                            th:onclick="'deleteComment(' + ${comment.id} + ')'">삭제</button>
+                    </div>
+                    <div class="edit-form" style="display: none;">
+                        <textarea class="edit-textarea" maxlength="300"></textarea>
+                        <span class="edit-char-count">0 / 300</span>
+                        <div class="btn-container">
+                            <button class="btn-save">저장</button>
+                            <button class="btn-cancel">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form th:action="@{/community/{id}/comment(id=${communityDto.id})}" method="post" class="comment-form"
+                id="commentForm">
+                <textarea id="commentContent" rows="2" placeholder="댓글을 입력하세요 최대 300자 까지 가능합니다." required
+                    maxlength="300"></textarea>
+                <span id="charCount">0 / 300</span>
+                <button type="submit">댓글 작성</button>
+            </form>
+        </div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const communityId = /*[[${communityDto.id}]]*/ 0;
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+            function editPost() {
+                window.location.href = `/community/edit/${communityId}`;
+            }
+
+            function deletePost() {
+                if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+                    fetch(`/community/${communityId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            [csrfHeader]: csrfToken
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            alert('게시글이 삭제되었습니다.');
+                            goToList();
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('게시글 삭제에 실패했습니다: ' + error.message);
+                        });
+                }
+            }
+
+            function goToList() {
+                // 저장된 URL이 있다면 해당 URL로 이동, 없으면 기본 커뮤니티 페이지로 이동
+                const returnUrl = sessionStorage.getItem("communityReturnUrl") || "/community";
+                window.location.href = returnUrl;
+            }
+
+            function limitEmptyLines(text, maxEmptyLines = 3) {
+                const lines = text.split('\n');
+                const result = [];
+                let emptyLineCount = 0;
+
+                for (const line of lines) {
+                    if (line.trim() === '') {
+                        emptyLineCount++;
+                        if (emptyLineCount <= maxEmptyLines) {
+                            result.push(line);
+                        }
+                    } else {
+                        result.push(line);
+                        emptyLineCount = 0;
+                    }
+                }
+
+                return result.join('\n');
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('commentForm');
+                const textarea = document.getElementById('commentContent');
+                const charCount = document.getElementById('charCount');
+
+                textarea.addEventListener('input', function () {
+                    this.value = limitEmptyLines(this.value);
+                    charCount.textContent = `${this.value.length} / 300`;
+                });
+
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    if (textarea.value.trim().length === 0) {
+                        alert('내용을 입력해주세요.');
+                        return;
+                    }
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify({ content: textarea.value })
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('댓글 작성 실패');
+                            return response.json();
+                        })
+                        .then(data => {
+                            addCommentToPage(data);
+                            textarea.value = '';
+                            charCount.textContent = '0 / 300';
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('댓글 작성에 실패했습니다: ' + error.message);
+                        });
+                });
+
+                initializeComments();
+            });
+
+            function initializeComments() {
+                document.querySelectorAll('.comment').forEach(comment => {
+                    const content = comment.querySelector('.comment-content');
+                    const toggleBtn = comment.querySelector('.btn-toggle');
+
+                    if (content.scrollHeight > 80) {
+                        content.style.maxHeight = '80px';
+                        content.style.overflow = 'hidden';
+                        toggleBtn.style.display = 'inline-block';
+
+                        toggleBtn.onclick = function () {
+                            toggleComment(content, this);
+                        };
+                    } else {
+                        toggleBtn.style.display = 'none';
+                    }
+
+                    const editTextarea = comment.querySelector('.edit-textarea');
+                    const editCharCount = comment.querySelector('.edit-char-count');
+                    if (editTextarea && editCharCount) {
+                        editTextarea.addEventListener('input', function () {
+                            this.value = limitEmptyLines(this.value);
+                            updateCharCount(this, editCharCount);
+                        });
+                    }
+                });
+            }
+
+            function toggleComment(content, button) {
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    content.style.overflow = 'visible';
+                    button.textContent = '접기';
+                } else {
+                    content.style.maxHeight = '80px';
+                    content.style.overflow = 'hidden';
+                    button.textContent = '펼치기';
+                }
+            }
+
+            function addCommentToPage(comment) {
+                const commentsContainer = document.getElementById('commentsContainer');
+                const newCommentDiv = document.createElement('div');
+                newCommentDiv.classList.add('comment');
+                newCommentDiv.setAttribute('data-id', comment.id);
+
+                const isAuthor = (comment.authorEmail === /*[[${currentUsername}]]*/ "");
+
+                newCommentDiv.innerHTML = `
+                    <div class="commenthead">
+                    <small>${comment.authorName} (${new Date(comment.createdAt).toLocaleString()})</small>
+                    </div>
+                    <p class="comment-content">${comment.content}</p>
+                    <button class="btn-toggle" style="display: none;">펼치기</button>
+                    ${isAuthor ? `
+                        <div class="comment-actions">
+                            <button class="btn-commentedit" onclick="editComment(${comment.id})">수정</button>
+                            <button class="btn-commentdelete" onclick="deleteComment(${comment.id})">삭제</button>
+                        </div>
+                    ` : ''}
+                    <div class="edit-form" style="display: none;">
+                        <textarea class="edit-textarea" maxlength="300"></textarea>
+                        <span class="edit-char-count">0 / 300</span>
+                        <div class="btn-container">
+                            <button class="btn-save">저장</button>
+                            <button class="btn-cancel">취소</button>
+                        </div>
+                    </div>
+                `;
+                commentsContainer.appendChild(newCommentDiv);
+                updateCommentCountFromDOM();
+
+                initializeComments();
+            }
+
+            function updateCharCount(textarea, charCountElement) {
+                const maxLength = textarea.getAttribute('maxlength');
+                const currentLength = textarea.value.length;
+                charCountElement.textContent = `${currentLength} / ${maxLength}`;
+            }
+
+            function editComment(commentId) {
+                const commentDiv = document.querySelector(`.comment[data-id="${commentId}"]`);
+                const contentP = commentDiv.querySelector('.comment-content');
+                const editForm = commentDiv.querySelector('.edit-form');
+                const textarea = editForm.querySelector('.edit-textarea');
+                const actionButtons = commentDiv.querySelector('.comment-actions');
+                const toggleBtn = commentDiv.querySelector('.btn-toggle');
+
+                textarea.value = contentP.textContent;
+
+                contentP.style.display = 'none';
+                actionButtons.style.display = 'none';
+                toggleBtn.style.display = 'none';
+                editForm.style.display = 'block';
+
+                editForm.querySelector('.btn-save').onclick = function () {
+                    const newContent = textarea.value.trim();
+                    if (newContent) {
+                        updateCommentOnServer(commentId, newContent);
+                    }
+                };
+
+                editForm.querySelector('.btn-cancel').onclick = function () {
+                    contentP.style.display = 'block';
+                    actionButtons.style.display = 'block';
+                    editForm.style.display = 'none';
+                    initializeComments();
+                };
+            }
+
+            function updateCommentOnServer(commentId, newContent) {
+                fetch(`/community/comment/${commentId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify({ content: newContent })
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error('댓글 수정 실패');
+                        return response.json();
+                    })
+                    .then(updatedComment => {
+                        const commentDiv = document.querySelector(`.comment[data-id="${commentId}"]`);
+                        const contentP = commentDiv.querySelector('.comment-content');
+                        const toggleBtn = commentDiv.querySelector('.btn-toggle');
+
+                        contentP.textContent = updatedComment.content;
+                        contentP.style.display = 'block';
+                        commentDiv.querySelector('.comment-actions').style.display = 'block';
+                        commentDiv.querySelector('.edit-form').style.display = 'none';
+
+                        contentP.style.maxHeight = null;
+                        contentP.style.overflow = null;
+                        toggleBtn.style.display = 'none';
+                        toggleBtn.textContent = '펼치기';
+
+                        if (contentP.scrollHeight > 80) {
+                            contentP.style.maxHeight = '80px';
+                            contentP.style.overflow = 'hidden';
+                            toggleBtn.style.display = 'inline-block';
+
+                            toggleBtn.onclick = function () {
+                                toggleComment(contentP, this);
+                            };
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('댓글 수정에 실패했습니다: ' + error.message);
+                    });
+            }
+
+            function deleteComment(commentId) {
+                if (confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
+                    fetch(`/community/comment/${commentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            [csrfHeader]: csrfToken
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('댓글 삭제 실패');
+                            return response.text();
+                        })
+                        .then(() => {
+                            const commentDiv = document.querySelector(`.comment[data-id="${commentId}"]`);
+                            commentDiv.remove();
+                            updateCommentCountFromDOM();
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('댓글 삭제에 실패했습니다: ' + error.message);
+                        });
+                }
+            }
+
+            // 댓글 텍스트 옆에 [댓글개수] 숫자 갱신시켜주는 함수.
+            function updateCommentCountFromDOM() {
+                const commentCountElement = document.getElementById('commentCount');
+                const commentsContainer = document.getElementById('commentsContainer');
+                const commentCount = commentsContainer.children.length;
+                commentCountElement.textContent = commentCount;
+            }
+
+
+            /*]]>*/
+        </script>
+</body>
+
+</html>

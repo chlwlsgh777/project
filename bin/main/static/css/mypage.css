@@ -1,0 +1,219 @@
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: rgb(25, 32, 48);
+    color: #ffffff;
+    margin: 0;
+    padding-left: 220px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h2 {
+    padding: 15px;
+}
+.hello {
+    padding: 15px;
+}
+
+
+.userinfoBox {
+    padding: 20px;
+    border-bottom: 1px solid rgb(209, 211, 212);
+}
+
+#header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-top: 20px;
+}
+
+.main-content {
+    width: calc(100% - 220px);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    flex-grow: 1;
+}
+
+.box {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px; 
+    height: auto;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+label {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#newNickname {
+    margin-left: 10px;
+    width: 40%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #333;
+}
+
+.main-content button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #06BFFF 0%, #2D73FF 100%);
+    color: white;
+    cursor: pointer;
+}
+
+.main-content button:hover {
+    opacity: 0.9;
+}
+
+
+#changeNicknameBtn{
+    margin-left: 30px;
+}
+#updateNickname,
+#checkNickname{
+    margin-left: 10px;
+
+}
+
+#nicknameChangeForm {
+    width: 500px;
+    margin-left: 30px;
+    display: none;
+}
+
+
+.nicknameText,
+.emailText{
+    margin-left: 10px;
+}
+
+.idInfo,
+.nicknameInfo {
+    display: flex;
+    padding: 10px;
+
+}
+.postlist-header th:nth-child(1),
+.postlist-header td:nth-child(1) {
+    width: 10%;
+}
+
+.postlist-header th:nth-child(2),
+.postlist-header td:nth-child(2) {
+    width: 70%;
+}
+
+.postlist-header th:nth-child(3),
+.postlist-header td:nth-child(3) {
+    width: 15%;
+}
+
+
+.detailBox {
+    width: 75%;
+    padding: 20px;
+}
+
+
+.postlist table {
+    width: 100%;
+    border-collapse: collapse;
+    
+}
+
+.postlist th {
+    padding: 5px;
+    text-align: center;
+    border-bottom: 3px solid rgb(209, 211, 212);
+    border-top: 3px solid rgb(209, 211, 212);
+}
+.postlist td {
+    padding: 10px;
+    border-bottom: 1px solid rgb(209, 211, 212);
+}
+
+.categoryText,
+.dateText {
+    text-align: center;
+}
+
+.titleText {
+    text-overflow: ellipsis;
+}
+
+
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    color: #00b8c8;
+}
+
+
+@media (max-width: 768px) {
+    body {
+        padding-left: 0;
+    }
+
+    .main-content {
+        width: 100%;
+        padding: 10px;
+    }
+
+    #header {
+        padding-top: 10px;
+    }
+
+    .box {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    input[type="text"],
+    .main-content button {
+        width: 90%;
+    }
+
+    label,
+    .success-message,
+    .error-message,
+    .main-content button,
+    h2,
+    h3 {
+        font-size: small;
+    }
+}

@@ -1,0 +1,336 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.community-layout {
+    width: 100%;
+    max-width: 1306px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.community-detail,
+.comments-section {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 30px;
+    margin-top: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.community-detail-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.community-detail-info {
+    border-top: 2px solid #00b8c8;
+    border-bottom: 2px solid rgb(209, 211, 212);
+    font-size: 14px;
+    color: rgb(209, 211, 212);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    padding: 0 15px;
+}
+
+.community-detail-content {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding: 0 15px;
+    font-family: Arial, sans-serif;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.community-detail-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.left-spacer {
+    flex: 1;
+}
+
+.btn-list {
+    flex: 1;
+    text-align: center;
+}
+
+.edit-delete-container {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-right: 10px;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-list {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.btn-edit {
+    background-color: #4CAF50;
+}
+
+.btn-delete {
+    background-color: #f44336;
+}
+
+.btn-list {
+    background-color: #00b8c8;
+    max-width: 100px;
+}
+
+.btn-edit:hover,
+.btn-delete:hover,
+.btn-list:hover {
+    opacity: 0.8;
+}
+
+.comments-section h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 15px;
+    color: white;
+}
+
+.comment {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.comment p {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.comment small {
+    font-size: 14px;
+    color: lightblue;
+}
+
+.comment-form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 100px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ddd;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+}
+
+.comment-form button {
+    background-color: #00b8c8;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    align-self: flex-end;
+}
+
+.comment-form button:hover {
+    background-color: #009aab;
+}
+
+#charCount {
+    position: absolute;
+    right: 10px;
+    bottom: 55px;
+    font-size: 13px;
+    color: #888;
+    margin-right: 5px;
+    margin-bottom: 10px;
+}
+
+.comment-content {
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.3s ease-out;
+}
+
+.more-button {
+    background-color: transparent;
+    border: none;
+    color: #00b8c8;
+    cursor: pointer;
+    display: block;
+    margin-top: 5px;
+}
+
+.comment-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.btn-commentedit,
+.btn-commentdelete {
+    background: none;
+    border: none;
+    color: #00b8c8;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.btn-commentdelete {
+    color: #f44336;
+    margin-right: 10px;
+}
+
+.btn-commentedit:hover,
+.btn-commentdelete:hover {
+    text-decoration: underline;
+}
+
+.edit-form {
+    margin-top: 10px;
+    position: relative;
+}
+
+.edit-form textarea {
+    width: 101%;
+    padding: 4.875px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 100px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ddd;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.edit-form .edit-char-count {
+    position: absolute;
+    right: 0px;
+    bottom: 35px;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+
+}
+
+.edit-form .btn-container {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.edit-form .btn-save,
+.edit-form .btn-cancel {
+    background: none;
+    border: none;
+    color: #00b8c8;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 5px 10px;
+}
+
+.edit-form .btn-cancel {
+    color: #f44336;
+}
+
+.edit-form .btn-save:hover,
+.edit-form .btn-cancel:hover {
+    text-decoration: underline;
+}
+
+.btn-toggle {
+    background: none;
+    border: none;
+    color: #00b6ff;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9em;
+}
+
+.commenthead {
+    border-bottom: 1px solid darkgrey;
+    padding-bottom: 7px;
+}
+
+@media (max-width: 768px) {
+    .community-layout {
+        padding: 10px;
+    }
+
+    .community-detail,
+    .comments-section {
+        padding: 20px;
+    }
+
+    .community-detail-actions {
+        flex-direction: column;
+    }
+
+    .btn-edit,
+    .btn-delete,
+    .btn-list {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .comment-form textarea {
+        min-height: 60px;
+    }
+
+    .comment-form button {
+        width: auto;
+        align-self: flex-end;
+    }
+}

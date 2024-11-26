@@ -45,7 +45,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/login", "/check-email", "/check-nickname", "/chat",
                                 "/api/check-login",
-                                "/api/games"))
+                                "/api/games",
+                                "/api/coupons/**"))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/chat", "/index", "/register", "/login",
                                 "/check-email", "/chatbot", "/community",

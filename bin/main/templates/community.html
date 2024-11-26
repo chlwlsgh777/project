@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>커뮤니티</title>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+	<!-- CSS 파일 링크 -->
+	<link rel="stylesheet" th:href="@{/css/community.css}">
+	<link rel="stylesheet" th:href="@{/css/main.css}">
+	<link rel="stylesheet" th:href="@{/css/nav.css}">
+</head>
+
+<body>
+	<!-- 네비게이션 바 -->
+	<div th:replace="~{nav :: global-nav}"></div>
+
+	<div class="community-layout">
+		<div class="community-header">
+			<div class="community-title" onclick="replace()">커뮤니티</div>
+			<div class="community-comment">
+				게임채널에 함께할 구성원을 모집하거나 자유롭게 의견을 나누는 공간입니다.
+			</div>
+			<div class="community-category">
+				<a th:href="@{/community(category='전체', page=0)}" th:class="${category == '전체' ? 'active' : ''}">전체</a>
+				<a th:href="@{/community(category='자유', page=0)}" th:class="${category == '자유' ? 'active' : ''}">자유</a>
+				<a th:href="@{/community(category='모집', page=0)}" th:class="${category == '모집' ? 'active' : ''}">모집</a>
+				<a th:href="@{/community(category='후기', page=0)}" th:class="${category == '후기' ? 'active' : ''}">후기</a>
+				<a th:href="@{/community(category='공략', page=0)}" th:class="${category == '공략' ? 'active' : ''}">공략</a>
+			</div>
+		</div>
+
+		<div class="comments-wrap">
+			<!-- 게시글 테이블 -->
+			<table class="community-e-header">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>카테고리</th>
+						<th>제목</th>
+						<th>작성자</th>
+						<th>작성날짜</th>
+						<th>조회수</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${#lists.isEmpty(communities)}">
+						<td colspan="6" style="text-align: center;">게시글이 없습니다.</td>
+					</tr>
+					<tr th:each="community : ${communities}">
+						<td th:text="${community.id}"></td>
+						<td th:text="${community.category}"></td>
+						<td>
+							<a th:href="@{/community/{id}(id=${community.id})}"
+								th:text="${community.title} + ' &nbsp;&nbsp;[' + ${community.commentCount} + ']'"
+								onclick="sessionStorage.setItem('communityReturnUrl', window.location.href)">
+							</a>
+						</td>
+						<td th:text="${community.authorName}"></td>
+						<td th:text="${#temporals.format(community.date, 'MM-dd')}"></td>
+						<td th:text="${community.viewCount != null ? community.viewCount : 0}"></td>
+					</tr>
+				</tbody>
+			</table>
+
+
+
+			<div class="add-post-btn-container">
+				<span class="add-post-btn" onclick="checkLoginBeforeWrite()">글쓰기</span>
+			</div>
+
+			<div class="community-footer">
+				<div class="pagination-container" th:if="${totalPages > 1}">
+					<div class="pagination-box">
+						<a href="javascript:void(0);" onclick="goToPage(0)" class="pagination-button">처음</a>
+						<a href="javascript:void(0);" th:onclick="'goToPage(' + ${currentPage - 1} + ')'"
+							class="pagination-button">이전</a>
+						<span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+							<a th:href="@{/community(page=${i}, search=${search}, category=${category})}"
+								th:text="${i + 1}" th:class="${i == currentPage ? 'active' : ''}"></a>
+						</span>
+						<a href="javascript:void(0);" th:onclick="'goToPage(' + ${currentPage + 1} + ')'"
+							class="pagination-button">다음</a>
+						<a href="javascript:void(0);" th:onclick="'goToPage(' + ${totalPages - 1} + ')'"
+							class="pagination-button">마지막</a>
+					</div>
+
+				</div>
+
+				<!-- 검색 폼 -->
+				<form class="community-search-bar" th:action="@{/community}" method="get">
+					<select id="search-option" name="searchOption">
+						<option value="전체">전체</option>
+						<option value="제목">제목</option>
+						<option value="내용">내용</option>
+						<option value="작성자">작성자</option>
+					</select>
+					<input type="text" name="search" th:value="${search}" placeholder="게시글 검색"
+						class="community-search-input" aria-label="게시글 검색" />
+					<input type="hidden" name="page" value="0" />
+					<input type="hidden" name="category" th:value="${category}" />
+					<button type="submit" class="btn-search">검색</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var totalPages = /*[[${totalPages}]]*/ 0;
+		var currentPage = /*[[${currentPage}]]*/ 0;
+
+		function goToPage(page) {
+			if (page < 0) {
+				alert('첫 페이지입니다.');
+				return;
+			}
+			if (page >= totalPages) {
+				alert('마지막 페이지입니다.');
+				return;
+			}
+
+			var url = new URL(window.location.href);
+			url.searchParams.set('page', page);
+			window.location.href = url.toString();
+		}
+		/*]]>*/
+
+		function checkLoginBeforeWrite() {
+			sessionStorage.setItem('communityReturnUrl', window.location.href);
+
+			fetch('/api/check-login')
+				.then(response => response.json())
+				.then(data => {
+					if (data.isLoggedIn) {
+						window.location.href = '/community/write';
+					} else {
+						alert('로그인 후 이용해주세요.');
+						window.location.href = '/login?redirect=/community/write';
+					}
+				});
+		}
+
+		function replace() {
+			window.location.href = '/community';
+		}
+
+		document.addEventListener('DOMContentLoaded', function () {
+			const urlParams = new URLSearchParams(window.location.search);
+			const category = urlParams.get('category') || '전체';
+			const activeLink = document.querySelector(`.community-category a[href*="category=${category}"]`);
+			if (activeLink) {
+				activeLink.classList.add('active');
+			}
+		});
+	</script>
+</body>
+
+</html>

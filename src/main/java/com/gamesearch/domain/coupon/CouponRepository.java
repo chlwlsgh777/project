@@ -13,4 +13,5 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     List<Coupon> findByGame_IdAndExpirationDateAfter(Long gameId, LocalDate date);
     Optional<Coupon> findByCode(String code);
     boolean existsByGameIdAndUser(Long gameId, User user);
+    boolean existsByGame_IdAndUser_Id(Long gameId, Long userId);
 }

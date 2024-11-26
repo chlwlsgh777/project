@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>관리자페이지</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{nav :: global-nav}"></div>
+    <div class="admin-dashboard-container">
+        <h1 class="admin-dashboard-title">관리자 대시보드</h1>
+
+        <div class="admin-stats">
+            <div class="admin-stat-item">
+                <p>총 사용자 수</p>
+                <span th:text="${userCount}"></span>
+            </div>
+            <div class="admin-stat-item">
+                <p>총 게임 수</p>
+                <span th:text="${gameCount}"></span>
+            </div>
+            <div class="admin-stat-item">
+                <p>총 쿠폰 수</p>
+                <span th:text="${couponCount}"></span>
+            </div>
+        </div>
+
+        <ul class="admin-menu">
+            <li><a href="/admin/users">사용자 관리</a></li>
+            <li><a href="/admin/games">게임 관리</a></li>
+            <li><a href="/admin/coupons">쿠폰 관리</a></li>
+        </ul>
+
+
+        <div class="no-access-section" sec:authorize="!hasRole('ADMIN')">
+            <h1>접근 권한이 없습니다</h1>
+            <p>이 페이지는 관리자만 접근할 수 있습니다.</p>
+        </div>
+    </div>
+</body>
+
+</html>

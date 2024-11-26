@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>글쓰기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community-write.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+</head>
+
+<body>
+    <div th:replace="~{nav :: global-nav}"></div>
+
+    <div class="community-layout">
+        <div class="community-detail">
+            <h2>새 글 작성</h2>
+            <form id="writeForm" th:action="@{/community/write}" method="post" th:object="${communityDto}">
+                <div>
+                    <label for="category">카테고리 :</label>
+                    <select id="category" th:field="*{category}">
+                        <option value="">선택하세요</option>
+                        <option value="자유">자유</option>
+                        <option value="모집">모집</option>
+                        <option value="후기">후기</option>
+                        <option value="공략">공략</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="title">제목 :</label>
+                    <br>
+                    <input type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요. 최대 40자까지 가능합니다." required
+                        maxlength="40">
+                    <br>
+                </div>
+                <div>
+                    <br>
+                    <label for="description">내용 :</label>
+                    <br>
+                    <textarea id="description" th:field="*{description}" required maxlength="4000"
+                        placeholder="글자수는 최대 4000자 입니다." oninput="updateCharacterCount()"></textarea>
+                    <div class="char-count-container">
+                        <div id="charCount">0 / 4000자</div>
+                    </div>
+                </div>
+                <div class="community-detail-actions">
+                    <!-- 항상 활성화된 상태 -->
+                    <button type="submit" class="btn-submit">글 작성</button>
+                    <button type="button" class="btn-cancel" onclick="goBack()">돌아가기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            var returnUrl = sessionStorage.getItem('communityReturnUrl');
+            if (returnUrl) {
+                window.location.href = returnUrl;
+                sessionStorage.removeItem('communityReturnUrl');
+            } else {
+                if (document.referrer.indexOf(window.location.host) !== -1) {
+                    history.back();
+                } else {
+                    window.location.href = '/community';
+                }
+            }
+        }
+
+        // 실시간 글자 수 업데이트 함수
+        function updateCharacterCount() {
+            const textarea = document.getElementById('description');
+            const charCount = document.getElementById('charCount');
+            const maxLength = 4000;
+
+            const currentLength = textarea.value.length;
+            charCount.textContent = `${currentLength} / ${maxLength}자`;
+
+            // 글자 수 초과 시 경고 색상으로 변경
+            if (currentLength >= maxLength) {
+                charCount.style.color = 'red';
+            } else {
+                charCount.style.color = 'white';
+            }
+        }
+
+        // 폼 제출 전 카테고리 체크 및 알림
+        document.getElementById('writeForm').addEventListener('submit', function (event) {
+            const categorySelect = document.getElementById('category');
+            if (categorySelect.value === "") {
+                alert("카테고리를 선택해주세요."); // 카테고리가 선택되지 않았을 경우 알림
+                event.preventDefault(); // 폼 제출 방지
+            }
+        });
+    </script>
+</body>
+
+</html>

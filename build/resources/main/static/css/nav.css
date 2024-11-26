@@ -22,10 +22,10 @@
 .nav-auth button {
     color: #ffffff;
     text-decoration: none;
-    padding: 10px 20px;
+    padding: 10px 10px;
     transition: background-color 0.3s;
     border-radius: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     text-align: left;
     font-family: 'Noto Sans KR', sans-serif;
     display: block;
@@ -53,14 +53,20 @@
 .nav-auth span {
     color: #ffffff;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     text-align: left;
+    font-size: 19px;
+}
+.global-nav a {
+    font-size: 19px;
 }
 
 .nav-auth button {
     background-color: #444;
     border: none;
     cursor: pointer;
+    font-size: 15px;
+    text-align: center;
 }
 
 .nav-links {

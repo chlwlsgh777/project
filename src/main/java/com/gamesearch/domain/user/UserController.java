@@ -89,9 +89,16 @@ public class UserController {
 
     @GetMapping("/api/check-login")
     @ResponseBody
-    public ResponseEntity<Map<String, Boolean>> checkLogin(Principal principal) {
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("isLoggedIn", principal != null);
+    public ResponseEntity<Map<String, Object>> checkLogin(Principal principal) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (principal != null) {
+            response.put("isLoggedIn", true);
+            response.put("userEmail", principal.getName()); // Principal에서 사용자 이메일 가져오기
+        } else {
+            response.put("isLoggedIn", false);
+            response.put("userEmail", null);
+        }
         return ResponseEntity.ok(response);
     }
 
