@@ -13,6 +13,7 @@ body {
     gap: 30px;
     height: fit-content;
     margin-bottom: 30px;
+    margin-top: 30px;
     /* box-container와 이미지 간 간격을 추가 */
     padding-bottom: 50px;
 }
@@ -99,10 +100,6 @@ body {
     /* 비율 유지 */
 }
 
-.icon-image {
-    width: 200px;
-
-}
 
 .discount-box {
     background-image: url('/images/steambackground.jpg');

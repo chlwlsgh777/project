@@ -9,10 +9,12 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/chatbot.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
+    <div th:replace="~{header}"></div>
 
     <main class="main-content">
         <h1>채팅봇</h1>
@@ -214,7 +216,7 @@
         // 쿠폰 발급 함수
         function issueCoupon(gameId) {
 
-            if (!confirm('쿠폰을 발급받으시겠습니까?\n 쿠폰 유효기간은 발급 날짜로부터 30일 입니다.')) {
+            if (!confirm('쿠폰을 발급받으시겠습니까?\n쿠폰 유효기간은 발급 날짜로부터 30일입니다.')) {
                 return; // 취소 버튼을 누르면 함수 종료
             }
 

@@ -10,10 +10,13 @@
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
+    <div th:replace="~{header}"></div>
+
     <div class="community-layout">
         <div class="community-detail">
             <h2 class="community-detail-title" th:text="${communityDto.title}">게시글 제목</h2>

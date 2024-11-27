@@ -8,10 +8,13 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/discount.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
+    <div th:replace="~{header}"></div>
+    
     <h1>할인중인 게임 목록</h1>
     <table>
         <thead>

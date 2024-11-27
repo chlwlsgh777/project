@@ -9,10 +9,13 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 
 <body>
     <div th:replace="~{nav :: global-nav}"></div>
+    <div th:replace="~{header}"></div>
+
     <div class="login-container">
         <h2>로그인</h2>
 

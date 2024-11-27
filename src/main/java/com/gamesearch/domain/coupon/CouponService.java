@@ -66,7 +66,7 @@ public class CouponService {
         // Pessimistic Lock으로 게임에 대한 쿠폰 발급 여부 확인
         boolean hasCoupon = couponRepository.existsByGame_IdAndUser_Id(game.getId(), user.getId());
         if (hasCoupon) {
-            throw new RuntimeException("이미 이 게임의 쿠폰을 발급받으셨습니다.");
+            throw new RuntimeException("이미 쿠폰을 발급받았습니다.");
         }
 
         // 쿠폰 생성 로직

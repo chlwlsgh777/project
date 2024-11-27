@@ -26,7 +26,7 @@ public class CommunityController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "전체") String category,
             @RequestParam(defaultValue = "제목") String searchOption) {
-        int size = 5;
+        int size = 10;
         Page<CommunityDto> communityPage;
 
         if (search != null && !search.isEmpty()) {
