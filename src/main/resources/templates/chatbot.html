@@ -260,7 +260,9 @@
                                 button.disabled = false;
                             });
                     } else {
+                        const currentUrl = encodeURIComponent(window.location.href);
                         alert('로그인 후 이용해주세요.');
+                        window.location.href = `/login?redirect=${currentUrl}`;
                         button.disabled = false;
                     }
                 });
